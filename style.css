@@ -1,0 +1,33 @@
+*,body {
+  margin: 0;
+  padding: 0;
+}
+#loggedInWrapper, #registerForm {
+  display: none;
+}
+
+.billListItem {
+  background-color: cadetblue;
+  width: 15rem;
+  padding: .4rem;
+  margin: 1rem;
+  cursor: pointer;
+}
+.billListItem:hover {
+  background-color: rgb(128, 128, 128);
+}
+
+#currentBillInfo {
+  background-color: burlywood;
+  /* width: 20%; */
+  /* height: 20px; */
+  width: 15rem;
+  padding: .4rem;
+  margin: 1rem;
+}
+
+.singleMove {
+  background-color: chocolate;
+  margin: 30px
+}
+
