@@ -1,5 +1,5 @@
 import {initializeApp} from 'https://www.gstatic.com/firebasejs/9.1.2/firebase-app.js'
-import {getFirestore, doc, collection, query, where, getDocs, addDoc} from 'https://www.gstatic.com/firebasejs/9.1.2/firebase-firestore.js'
+import {getFirestore, doc, arrayUnion,setDoc, updateDoc, collection, query, where, getDoc, getDocs, addDoc} from 'https://www.gstatic.com/firebasejs/9.1.2/firebase-firestore.js'
 import {getAuth, onAuthStateChanged,createUserWithEmailAndPassword, signInWithEmailAndPassword,signOut, GoogleAuthProvider, signInWithRedirect} from 'https://www.gstatic.com/firebasejs/9.1.2/firebase-auth.js'
 
 const firebaseConfig = {
@@ -44,7 +44,8 @@ signInWithEmailAndPassword(auth, newUsername, newPassword)
     console.log(newUsername, newPassword)
     createUserWithEmailAndPassword(auth, newUsername,newPassword).then((userCredential) => {
       // User signed in.
-      console.log("Yes")
+      console.log("Yes", userCredential.user)
+      dbAddNewUser(userCredential.user)
     })
     .catch((error) => {
       const errorCode = error.code;
@@ -74,7 +75,6 @@ window.addEventListener('DOMContentLoaded', (event) => {
       newbillbtn.setAttribute('id', 'newbill-btn')
       loggedInWrapper.insertBefore(newbillbtn, loggedInWrapper.firstChild);
       // loggedInWrapper.appendChild(newbillbtn)
-
 
       let currentsharedbillsbtn = document.createElement('button') 
       currentsharedbillsbtn.innerHTML = 'Show current shared bills';
@@ -122,6 +122,16 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
 } )
 
+function dbAddNewUser(user){
+  let userArray = [user.uid,user.email]
+  const docRef = addDoc(collection(db, "users"), {
+    'userInfo': userArray
+  }).then((e)=>{
+    // console.log("Yes. Db user added", e)
+  }).catch((f)=>{
+    // console.log("No. Db user NOT added", f)
+  })
+}
 
 function addNewBill(user){
   // console.log("Add  New bill",user.uid)
@@ -130,28 +140,44 @@ function addNewBill(user){
     const docRef = addDoc(collection(db, "bills"), {
     users: [user.uid],
     moves: [
-      createPaymentObj(thisUserId,32),
-      createPaymentObj(thisUserId,12),
-      createPaymentObj(thisUserId,532),
-      createPaymentObj(thisUserId,52),
-      createPaymentObj(thisUserId,2),
+      createPaymentObj(thisUserId,1,"Is"),
+      // createPaymentObj(thisUserId,1,"Jess"),
+      // createPaymentObj(thisUserId,1,"Jess"),
+      createPaymentObj(thisUserId,121,"it"),
+      createPaymentObj(thisUserId,51,"clear"),
+      createPaymentObj(thisUserId,51,"now?"),
+      // createPaymentObj(thisUserId,532,"Dinner at BurgerKing"),
+      // createPaymentObj(thisUserId,52,"Beers"),
+      // createPaymentObj(thisUserId,2,"Ride"),
     ]
   }).then((e)=>{
     // console.log("Document written with ID: ", docRef.id);
     // console.log("Document written with ID: ", e.id);
   })
-  
 
 }
 
-function createPaymentObj(userId,payedAmmount){
+function createPaymentObj(userId,payedAmmount,paymentConcept){
   // console.log("Create")
   // console.log(userId)
   return {
     date: new Date(),
     user: userId,
-    ammount: payedAmmount
+    ammount: payedAmmount,
+    concept: paymentConcept
   }
+}
+
+function retrieveUserId(email){
+  const q = query(collection(db, "users"), where("userInfo", "array-contains", email));
+  return getDocs(q).then((es)=>{
+    let found
+    es.forEach((doc) => {
+      found = doc.data()['userInfo'][0] 
+      return found
+    });
+    return found
+  })
 }
 
 function getCurrentSharedBills(user){
@@ -164,7 +190,7 @@ function getCurrentSharedBills(user){
  
   getDocs(q).then((es)=>{
     es.forEach((doc) => {
-      renderBill(doc.data())
+      renderBill(doc)
       // console.log("AS",doc.data())
     });
     
@@ -172,9 +198,9 @@ function getCurrentSharedBills(user){
 }
 
 
-function renderBill(billsData){
-  
-  let thisBillUsers = billsData['users']
+function renderBill(bill){
+  // console.log("THIS",bill.id)
+  let thisBillUsers = bill.data()['users']
 
   let thisBillDiv = document.createElement('div')
   thisBillDiv.classList.add("billListItem")
@@ -187,7 +213,8 @@ function renderBill(billsData){
   currentBillsDiv.appendChild(thisBillDiv)
 
   thisBillDiv.addEventListener('click', function(){
-    renderCurrentBillInfo(billsData)
+    
+    renderCurrentBillInfo(bill)
   })
 }
 
@@ -195,7 +222,7 @@ function renderCurrentBillInfo(bill){
   const currentBillInfo = document.getElementById('currentBillInfo')
   currentBillInfo.textContent = ""
   
-  bill.moves.forEach((singleMove)=>{
+  bill.data().moves.forEach((singleMove)=>{
     // console.log(singleMove,"as")
     let singleMoveDiv = renderSingleMoveDiv(singleMove)
     currentBillInfo.appendChild(singleMoveDiv)
@@ -205,24 +232,67 @@ function renderCurrentBillInfo(bill){
   addUserBtn.innerHTML = "Add a friend to this bill"
   currentBillInfo.appendChild(addUserBtn)
 
-  addUserBtn.addEventListener('click', function(){
-    let newEmail = 'mike@mike.com'
-    retrieveUserId(newEmail)
-  })
 
+  let newEmail = 'mike@mike.com'
+  retrieveUserId(newEmail)
+  .then((thisUserId)=>{
+   addUserBtn.addEventListener('click', function(){
+     addNewUserToBill(thisUserId,bill)
+    })
+    })
+
+}
+
+function addNewUserToBill(newUserId,thisBill){
+  console.log(`Add ${newUserId} to the bill DB: `, thisBill.id);
+  // const docRef = collection(db, 'bills').getDoc(thisBill.id)
+  
+  var billRef = doc(db,"bills",thisBill.id)
+  console.log(billRef)
+
+  
+
+  // Atomically add a new region to the "regions" array field.
+  billRef.update({
+ users: getFirestore.FieldValue.arrayUnion("users")
+ });
+
+
+
+//   billRef.update(
+//     {
+//     'users': db.FieldValue.arrayUnion(newUserId)
+// });
+
+
+  // doc, setDoc, updateDoc 
+  
+
+  
+// var setWithMerge = setDoc(billRef,{
+//   'usersa': newUserId
+// }, { merge: true });
+
+
+// billRef.update({
+  // 'users': db.FieldValue.arrayUnion("greater_virginia")
+// });
+
+
+  
+  
 
 }
 
 function renderSingleMoveDiv(move){
+  let concept = move['concept']
+  let ammount = move['ammount']
+
   let returnDiv = document.createElement('div')
   returnDiv.classList.add('singleMove')
-  returnDiv.innerHTML = move['ammount']
+  returnDiv.innerHTML = `${concept}, ${ammount}`
   // returnDiv.innerHTML += move['user']
   return returnDiv
 }
 
 
-
-function retrieveUserId(email){
-  console.log(email)
-}
