@@ -1,7 +1,7 @@
-import {initializeApp} from 'https://www.gstatic.com/firebasejs/9.1.2/firebase-app.js'
-import {getFirestore, doc, arrayUnion,setDoc, updateDoc, collection, query, where, getDoc, getDocs, addDoc} from 'https://www.gstatic.com/firebasejs/9.1.2/firebase-firestore.js'
-import {getAuth, onAuthStateChanged,createUserWithEmailAndPassword, signInWithEmailAndPassword,signOut, GoogleAuthProvider, signInWithRedirect} from 'https://www.gstatic.com/firebasejs/9.1.2/firebase-auth.js'
-
+import {initializeApp} from "https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js"
+import {getFirestore, doc, arrayUnion,setDoc, updateDoc, collection, query, where, getDoc, getDocs, addDoc} from "https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore.js"
+import {getAuth, onAuthStateChanged,createUserWithEmailAndPassword, signInWithEmailAndPassword,signOut, GoogleAuthProvider, signInWithRedirect} from "https://www.gstatic.com/firebasejs/9.1.3/firebase-auth.js"
+// import firebase from 'firebase/compat/app';
 const firebaseConfig = {
   apiKey: "AIzaSyDFH-HvSyQ2nL2V0XWMV1dFyVrgna_HzBI",
   authDomain: "stingy-d49e9.firebaseapp.com",
@@ -244,44 +244,14 @@ function renderCurrentBillInfo(bill){
 }
 
 function addNewUserToBill(newUserId,thisBill){
-  console.log(`Add ${newUserId} to the bill DB: `, thisBill.id);
-  // const docRef = collection(db, 'bills').getDoc(thisBill.id)
-  
-  var billRef = doc(db,"bills",thisBill.id)
-  console.log(billRef)
-
-  
-
-  // Atomically add a new region to the "regions" array field.
-  billRef.update({
- users: getFirestore.FieldValue.arrayUnion("users")
- });
-
-
-
-//   billRef.update(
-//     {
-//     'users': db.FieldValue.arrayUnion(newUserId)
-// });
-
-
-  // doc, setDoc, updateDoc 
-  
-
-  
-// var setWithMerge = setDoc(billRef,{
-//   'usersa': newUserId
-// }, { merge: true });
-
-
-// billRef.update({
-  // 'users': db.FieldValue.arrayUnion("greater_virginia")
-// });
-
-
+  let billRef = doc(db,"bills",thisBill.id)
+  let newUsersArray = thisBill.data()['users']
+  if(!newUsersArray.includes(newUserId)){
+    newUsersArray.push(newUserId)  
+  }
   
   
-
+  setDoc(billRef, { 'users': newUsersArray }, { merge: true }); 
 }
 
 function renderSingleMoveDiv(move){
