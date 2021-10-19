@@ -31,3 +31,17 @@
   margin: 30px
 }
 
+
+
+.dots:after {
+  content: '\2807';
+  font-size: 20px;
+  }
+
+.dots:hover::after {
+  /* background-color: aquamarine; */
+  cursor: pointer;
+  /* font-weight: 900; */
+    /* content: '\2807'; */
+    /* font-size: 20px; */
+    }

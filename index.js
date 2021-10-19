@@ -199,6 +199,7 @@ function getCurrentSharedBills(user){
 
 
 function renderBill(bill){
+  // currentBillsDiv.textContent = ""
   // console.log("THIS",bill.id)
   let thisBillUsers = bill.data()['users']
 
@@ -222,15 +223,31 @@ function renderCurrentBillInfo(bill){
   const currentBillInfo = document.getElementById('currentBillInfo')
   currentBillInfo.textContent = ""
   
+//Header
+  
+  let singleMoveDiv = renderBillHeader(bill)
+  currentBillInfo.appendChild(singleMoveDiv)
+
+  //Moves in this Bill
   bill.data().moves.forEach((singleMove)=>{
     // console.log(singleMove,"as")
     let singleMoveDiv = renderSingleMoveDiv(singleMove)
     currentBillInfo.appendChild(singleMoveDiv)
   })
 
+  //Add new move btn
+  let addMoveBtn = document.createElement('button')
+  addMoveBtn.innerHTML = "+"
+  let newAmmountMove = 69
+  let newConcept = "Good stuff"
+  currentBillInfo.appendChild(addMoveBtn)
+  addNewMove(bill,newAmmountMove, newConcept)
+  
+  
+//Add friend btn
   let addUserBtn = document.createElement('button')
   addUserBtn.innerHTML = "Add a friend to this bill"
-  currentBillInfo.appendChild(addUserBtn)
+  // currentBillInfo.appendChild(addUserBtn)
 
 
   let newEmail = 'mike@mike.com'
@@ -249,9 +266,19 @@ function addNewUserToBill(newUserId,thisBill){
   if(!newUsersArray.includes(newUserId)){
     newUsersArray.push(newUserId)  
   }
-  
-  
   setDoc(billRef, { 'users': newUsersArray }, { merge: true }); 
+}
+
+function renderBillHeader(bill){
+  let returnDiv = document.createElement('div')
+  returnDiv.classList.add("bill-header")
+    let textDiv = document.createElement('div')
+    textDiv.innerText = 'bill'
+    let dotsDiv = document.createElement('div')
+    dotsDiv.classList.add("dots")
+    returnDiv.appendChild(textDiv)
+    returnDiv.appendChild(dotsDiv)
+  return returnDiv
 }
 
 function renderSingleMoveDiv(move){
@@ -266,3 +293,24 @@ function renderSingleMoveDiv(move){
 }
 
 
+
+function addNewMove(bill,ammount,paymentConcept){
+  // console.log("Yes", newAmmountMove, bill.data())
+  // console.log(auth.currentUser.uid)
+  let userId = auth.currentUser.uid;
+  let billRef = doc(db,"bills",bill.id)
+  let movesArray = bill.data()['moves']
+  let newMove = createPaymentObj(userId,ammount,paymentConcept)
+  movesArray.push(newMove)  
+
+    
+  setDoc(billRef, { 'moves': movesArray }, { merge: true }).then((e)=>{
+    console.log("Yes")
+  }).catch((err)=>{
+    console.log(err)
+    console.log("ERROR")
+  })
+
+
+
+}
