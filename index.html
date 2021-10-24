@@ -15,12 +15,14 @@
   <body>
 
     <!-- <div class="dots"></div> -->
+    <div id="loggedOutWrapper">
+      <form id="registerForm" autocomplete="off">
+        <input type="text" name="username" id="username" autocomplete="username">
+        <input type="password" name="password" id="password" autocomplete="new-password">
+        <input type="submit" value="Register">
+      </form>
+    </div>
 
-    <form id="registerForm" autocomplete="off">
-      <input type="text" name="username" id="username" autocomplete="username">
-      <input type="password" name="password" id="password" autocomplete="new-password">
-      <input type="submit" value="Register">
-    </form>
     <div id="loggedInWrapper">
       <div id="userInfoDiv"></div>
       <button id="logout-btn">Log out</button>

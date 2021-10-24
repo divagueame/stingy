@@ -1,7 +1,8 @@
 import {initializeApp} from "https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js"
 import {getFirestore, doc, arrayUnion,setDoc, updateDoc, collection, query, where, getDoc, getDocs, addDoc} from "https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore.js"
 import {getAuth, onAuthStateChanged,createUserWithEmailAndPassword, signInWithEmailAndPassword,signOut, GoogleAuthProvider, signInWithRedirect} from "https://www.gstatic.com/firebasejs/9.1.3/firebase-auth.js"
-// import firebase from 'firebase/compat/app';
+
+
 const firebaseConfig = {
   apiKey: "AIzaSyDFH-HvSyQ2nL2V0XWMV1dFyVrgna_HzBI",
   authDomain: "stingy-d49e9.firebaseapp.com",
@@ -21,6 +22,8 @@ const auth = getAuth();
 const registerForm = document.getElementById('registerForm')
 const logoutbtn = document.getElementById('logout-btn')
 const loggedInWrapper = document.getElementById('loggedInWrapper')
+const loggedOutWrapper = document.getElementById('loggedOutWrapper')
+
 // const userInfoDiv = document.getElementById('userInfoDiv')
 const currentBillsDiv = document.getElementById('currentBillsDiv')
 
@@ -35,22 +38,20 @@ signInWithEmailAndPassword(auth, newUsername, newPassword)
     // Signed in 
     const user = userCredential.user;
     console.log("User in!")
-    ;
-
 
   })
   .catch((error) => {
-    console.log("User not found")
+    console.log("User not found. Creating a new account")
     console.log(newUsername, newPassword)
     createUserWithEmailAndPassword(auth, newUsername,newPassword).then((userCredential) => {
       // User signed in.
-      console.log("Yes", userCredential.user)
+      // console.log("Yes", userCredential.user)
       dbAddNewUser(userCredential.user)
     })
     .catch((error) => {
       const errorCode = error.code;
       const errorMessage = error.message;
-      console.log("Cannot sign in",errorCode)
+      console.log("Cannot create new account",errorCode)
       console.log(errorMessage)
       // ..
     });
@@ -64,11 +65,11 @@ signInWithEmailAndPassword(auth, newUsername, newPassword)
 
 window.addEventListener('DOMContentLoaded', (event) => {
   onAuthStateChanged(auth, (user) => {
-    console.log("State changed")
+    //  User is logged in
     if (user) {
       const uid = user.uid;
-      registerForm.style.display = 'none'
-      loggedInWrapper.style.display = 'block'
+      loggedOutWrapper.style.display = 'none'
+      loggedInWrapper.style.display = 'flex'
       
       let newbillbtn = document.createElement('button') 
       newbillbtn.innerHTML = 'Add new shared bill';
@@ -84,10 +85,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
       })
       // loggedInWrapper.appendChild(currentsharedbillsbtn)
       loggedInWrapper.insertBefore(currentsharedbillsbtn, loggedInWrapper.firstChild);
-      
       userInfoDiv.innerHTML = user.email + " "  + user.uid
       
-        
       newbillbtn.addEventListener('click', function(){
         addNewBill(user)
         getCurrentSharedBills(user)
@@ -105,8 +104,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
           })
       
 
-    } else {  
-      registerForm.style.display = 'block'
+    } else {   //User is logged out
+      loggedOutWrapper.style.display = 'flex'
       loggedInWrapper.style.display = 'none'
 
       let newbillbtn = document.getElementById('newbill-btn')
@@ -114,20 +113,21 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
       let currentsharedbillsbtn = document.getElementById('currentsharedbills-btn')
       currentsharedbillsbtn.parentElement.removeChild(currentsharedbillsbtn)
-
       currentBillsDiv.innerHTML = '';
       currentBillInfo.innerHTML = ''
     }
   })
-
 } )
 
 function dbAddNewUser(user){
   let userArray = [user.uid,user.email]
+  let userName = user.email.match(/^(.*?)\@/)
   const docRef = addDoc(collection(db, "users"), {
-    'userInfo': userArray
+    'userInfo': userArray,
+    'userName': userName[1]
+
   }).then((e)=>{
-    // console.log("Yes. Db user added", e)
+    console.log("Yes. Db user added", e)
   }).catch((f)=>{
     // console.log("No. Db user NOT added", f)
   })
@@ -136,7 +136,7 @@ function dbAddNewUser(user){
 function addNewBill(user){
   // console.log("Add  New bill",user.uid)
   let thisUserId = user.uid
-  console.log(thisUserId)
+  // console.log(thisUserId)
     const docRef = addDoc(collection(db, "bills"), {
     users: [user.uid],
     moves: [
@@ -180,9 +180,23 @@ function retrieveUserId(email){
   })
 }
 
+
+function retrieveUserName(id){
+  const q = query(collection(db, "users"), where("userInfo", "array-contains", id));
+  return getDocs(q).then((es)=>{
+    let found
+    es.forEach((doc) => {
+      console.log("doc is: ", doc.data()['userName'])
+      found = doc.data()['userName']
+      return found
+    });
+    return found
+  })
+}
+
+
 function getCurrentSharedBills(user){
   if(currentBillsDiv.innerHTML!=''){
-    console.log(currentBillsDiv.children)
     currentBillsDiv.textContent = ''
   }
    let thisUserId = user.uid
@@ -191,7 +205,6 @@ function getCurrentSharedBills(user){
   getDocs(q).then((es)=>{
     es.forEach((doc) => {
       renderBill(doc)
-      // console.log("AS",doc.data())
     });
     
   })
@@ -206,15 +219,20 @@ function renderBill(bill){
   let thisBillDiv = document.createElement('div')
   thisBillDiv.classList.add("billListItem")
 
-  thisBillUsers.forEach((userName)=>{
+  thisBillUsers.forEach((userId)=>{
     let usersDiv = document.createElement('div');
-    usersDiv.innerHTML = userName
-    thisBillDiv.appendChild(usersDiv)
+    // retrieveUserName
+    retrieveUserName(userId).then((userName)=>{
+      
+      usersDiv.innerHTML = userName
+      thisBillDiv.appendChild(usersDiv)
+    })
+    
+    
   })
   currentBillsDiv.appendChild(thisBillDiv)
 
   thisBillDiv.addEventListener('click', function(){
-    
     renderCurrentBillInfo(bill)
   })
 }
@@ -241,22 +259,30 @@ function renderCurrentBillInfo(bill){
   let newAmmountMove = 69
   let newConcept = "Good stuff"
   currentBillInfo.appendChild(addMoveBtn)
-  addNewMove(bill,newAmmountMove, newConcept)
+  // addNewMove(bill,newAmmountMove, newConcept)
   
   
 //Add friend btn
   let addUserBtn = document.createElement('button')
   addUserBtn.innerHTML = "Add a friend to this bill"
-  // currentBillInfo.appendChild(addUserBtn)
+  currentBillInfo.appendChild(addUserBtn)
 
+  
 
   let newEmail = 'mike@mike.com'
   retrieveUserId(newEmail)
   .then((thisUserId)=>{
-   addUserBtn.addEventListener('click', function(){
-     addNewUserToBill(thisUserId,bill)
+    // console.log("And we have this user id...", thisUserId)
+    if (thisUserId!=undefined) {
+      addUserBtn.addEventListener('click', function(){
+        addNewUserToBill(thisUserId,bill)
+       })
+    }
+   
     })
-    })
+  .catch((err)=>{
+    alert(err.code, err.message)
+  })
 
 }
 
@@ -273,7 +299,7 @@ function renderBillHeader(bill){
   let returnDiv = document.createElement('div')
   returnDiv.classList.add("bill-header")
     let textDiv = document.createElement('div')
-    textDiv.innerText = 'bill'
+    textDiv.innerText = ''
     let dotsDiv = document.createElement('div')
     dotsDiv.classList.add("dots")
     returnDiv.appendChild(textDiv)
@@ -295,13 +321,11 @@ function renderSingleMoveDiv(move){
 
 
 function addNewMove(bill,ammount,paymentConcept){
-  // console.log("Yes", newAmmountMove, bill.data())
-  // console.log(auth.currentUser.uid)
   let userId = auth.currentUser.uid;
   let billRef = doc(db,"bills",bill.id)
   let movesArray = bill.data()['moves']
   let newMove = createPaymentObj(userId,ammount,paymentConcept)
-  movesArray.push(newMove)  
+  movesArray.push(newMove)
 
     
   setDoc(billRef, { 'moves': movesArray }, { merge: true }).then((e)=>{
@@ -314,3 +338,9 @@ function addNewMove(bill,ammount,paymentConcept){
 
 
 }
+
+
+function toggleInputPanel(){
+
+}
+
