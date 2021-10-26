@@ -2,6 +2,13 @@
 @import url('https://fonts.googleapis.com/css2?family=Karma:wght@600&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500&display=swap');
 
+html, body {
+  font-size: 40px;      
+  margin:0; /* remove default margin */
+  padding:0; /* remove default padding */
+  width:100%; /* take full browser width */
+  height:100%; /* take full browser height*/
+}
 
 *,body {
   margin: 0;
@@ -9,11 +16,7 @@
   box-sizing: border-box;
 
 }
-body {
-    height: 100vh;
-    overflow: hidden;
-  /* max-height: 100vh; */
-}
+
 
 #loggedInWrapper, #loggedOutWrapper {
   display: none;
