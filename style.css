@@ -9,19 +9,19 @@
 
 #loggedOutWrapper {
   height: 100vh;
-  background-color: chocolate;
+  /* background-color: chocolate; */
   /* display: flex; */
-  justify-content: center;
-  align-items: center;
+  /* justify-content: center; */
+  /* align-items: center; */
 }
-
+/* 
 #registerForm {
   width: 25%;
   height: 50vh;
   border: rgb(255, 221, 221) 4px solid;
   /* display: flex; */
-  flex-direction: column;
-}
+  /* flex-direction: column; */
+/* } */
 
 #loggedInWrapper {
   background-color: bisque;
@@ -32,45 +32,3 @@
   padding: 1rem;
 }
 
-.billListItem {
-  background-color: cadetblue;
-  width: 15rem;
-  padding: .4rem;
-  margin: 1rem;
-  cursor: pointer;
-}
-.billListItem:hover {
-  background-color: rgb(128, 128, 128);
-}
-
-#currentBillInfo {
-  /* background-color: burlywood; */
-  /* width: 20%; */
-  /* height: 20px; */
-  width: 15rem;
-  padding: .4rem;
-  margin: 1rem;
-}
-
-.singleMove {
-  background-color: chocolate;
-  border-radius: 5px;
-  margin-top: 3px;
-  padding: 1rem;
-  border-bottom: 2px solid blueviolet;
-}
-
-
-
-.dots:after {
-  content: '\2807';
-  font-size: 20px;
-  }
-
-.dots:hover::after {
-  /* background-color: aquamarine; */
-  cursor: pointer;
-  /* font-weight: 900; */
-    /* content: '\2807'; */
-    /* font-size: 20px; */
-    }

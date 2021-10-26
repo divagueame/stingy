@@ -109,10 +109,17 @@ window.addEventListener('DOMContentLoaded', (event) => {
       loggedInWrapper.style.display = 'none'
 
       let newbillbtn = document.getElementById('newbill-btn')
-      newbillbtn.parentElement.removeChild(newbillbtn)
+      if(newbillbtn){
+        newbillbtn.parentElement.removeChild(newbillbtn)
+      }
+      
 
+      
       let currentsharedbillsbtn = document.getElementById('currentsharedbills-btn')
-      currentsharedbillsbtn.parentElement.removeChild(currentsharedbillsbtn)
+      if(currentsharedbillsbtn){
+        currentsharedbillsbtn.parentElement.removeChild(currentsharedbillsbtn)
+      }
+      
       currentBillsDiv.innerHTML = '';
       currentBillInfo.innerHTML = ''
     }
@@ -186,7 +193,7 @@ function retrieveUserName(id){
   return getDocs(q).then((es)=>{
     let found
     es.forEach((doc) => {
-      console.log("doc is: ", doc.data()['userName'])
+      // console.log("doc is: ", doc.data()['userName'])
       found = doc.data()['userName']
       return found
     });
@@ -241,14 +248,12 @@ function renderCurrentBillInfo(bill){
   const currentBillInfo = document.getElementById('currentBillInfo')
   currentBillInfo.textContent = ""
   
-//Header
-  
+  //Header
   let singleMoveDiv = renderBillHeader(bill)
   currentBillInfo.appendChild(singleMoveDiv)
 
   //Moves in this Bill
   bill.data().moves.forEach((singleMove)=>{
-    // console.log(singleMove,"as")
     let singleMoveDiv = renderSingleMoveDiv(singleMove)
     currentBillInfo.appendChild(singleMoveDiv)
   })
@@ -262,27 +267,34 @@ function renderCurrentBillInfo(bill){
   // addNewMove(bill,newAmmountMove, newConcept)
   
   
-//Add friend btn
+  //Add friend btn
   let addUserBtn = document.createElement('button')
   addUserBtn.innerHTML = "Add a friend to this bill"
   currentBillInfo.appendChild(addUserBtn)
 
+  addUserBtn.addEventListener('click', function(){
+    toggleInputPanel()
+  })
   
 
-  let newEmail = 'mike@mike.com'
-  retrieveUserId(newEmail)
-  .then((thisUserId)=>{
-    // console.log("And we have this user id...", thisUserId)
-    if (thisUserId!=undefined) {
-      addUserBtn.addEventListener('click', function(){
-        addNewUserToBill(thisUserId,bill)
-       })
-    }
+  // let newEmail = 'mike@mike.com'
+  // retrieveUserId(newEmail)
+  // .then((thisUserId)=>{
+  //   // console.log("And we have this user id...", thisUserId)
+  //   if (thisUserId!=undefined) {
+  //     addUserBtn.addEventListener('click', function(){
+  //       addNewUserToBill(thisUserId,bill)
+  //      })
+  //   }
    
-    })
-  .catch((err)=>{
-    alert(err.code, err.message)
-  })
+  //   })
+  // .catch((err)=>{
+  //   alert(err.code, err.message)
+  // })
+
+    //Create hidden panel to add new user to a bill
+    let newUserPanel = createNewPanel()
+    currentBillInfo.appendChild(newUserPanel)
 
 }
 
@@ -339,8 +351,21 @@ function addNewMove(bill,ammount,paymentConcept){
 
 }
 
+function createNewPanel(){
+  let panel = document.createElement('div')
+  panel.classList.add('add-new-user-panel')
+  panel.classList.add('hidden-panel')
+  
+  let emailInput = document.createElement('input')
+  emailInput.classList.add('add-email-text-input')
+  emailInput.setAttribute('type','text')
+  // emailInput.autofocus = true
+  panel.appendChild(emailInput)
+  return panel
+}
 
 function toggleInputPanel(){
-
+  document.querySelector('.add-new-user-panel').classList.toggle('hidden-panel');
+  document.querySelector('.add-email-text-input').focus()
 }
 
