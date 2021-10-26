@@ -13,7 +13,8 @@
 }
 
 #loggedOutWrapper {
-  height: 100vh;
+  min-height: 100vh;
+  max-height: 100vh;
   background-image: url('./img/mobile-bg1.svg');
   border: 9px white solid;
   display: flex;
