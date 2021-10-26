@@ -45,7 +45,7 @@ header {
   align-items: center;
 }
 
-/* 
+
 h1 {
   font-family: "Tw Cen MT";
   font-size: 96px;
@@ -57,6 +57,12 @@ h3 {
   color: #ffffff;
 }
 
+#registerForm {
+  background-color: #094067;
+  border-radius: 11px 11px 0 0;
+  padding: 20px;
+}
+/*  
 
 #loggedInWrapper {
   background-color: bisque;
@@ -66,12 +72,6 @@ h3 {
   padding: 1rem;
 }
 
-#registerForm {
-  background-color: #094067;
-  border-radius: 11px 11px 0 0;
-  height: 40vh;
-  padding: 20px;
-}
 
 p {
   font-family: 'IBM Plex Sans', sans-serif
