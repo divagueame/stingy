@@ -7,22 +7,26 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  min-height: 100vh;
-  max-height: 100vh;
+
 }
+body {
+    height: 100vh;
+  /* max-height: 100vh; */
+}
+
 #loggedInWrapper, #loggedOutWrapper {
   display: none;
 }
 
 #loggedOutWrapper {
-  min-height: 100vh;
-  max-height: 100vh;
+  min-height: 100%;
+  /* max-height: 100vh; */
   background-image: url('./img/mobile-bg1.svg');
   border: 9px white solid;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  overflow-y: hidden;
+  /* overflow-y: hidden; */
   /* align-items: center; */
 }
 header {
@@ -44,7 +48,7 @@ h3 {
 
 #loggedInWrapper {
   background-color: bisque;
-  min-height: 100vh;
+  /* min-height: 100vh; */
   justify-content: flex-start;
   align-items: center;
   flex-direction: column;
