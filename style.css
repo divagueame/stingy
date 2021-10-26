@@ -1,4 +1,4 @@
-@import url('http://db.onlinewebfonts.com/c/9b62dc86f936227b3f7b367bd0b6c05e?family=Tw+Cen+MT');
+@import url('https://db.onlinewebfonts.com/c/9b62dc86f936227b3f7b367bd0b6c05e?family=Tw+Cen+MT');
 @import url('https://fonts.googleapis.com/css2?family=Karma:wght@600&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500&display=swap');
 
@@ -14,9 +14,14 @@ html, body {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-
 }
 
+
+
+a {
+  color: white;
+  text-decoration: none;
+}
 
 #loggedInWrapper, #loggedOutWrapper {
   display: none;
@@ -32,12 +37,8 @@ html, body {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  /* overflow-y: hidden; */
-  /* align-items: center; */
+  
 }
-
-
-
 
 header {
   display: flex;
@@ -60,7 +61,25 @@ h3 {
 #registerForm {
   background-color: #094067;
   border-radius: 11px 11px 0 0;
-  padding: 20px;
+  /* padding: 20px; */
+  font-family: 'IBM Plex Sans', sans-serif;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+}
+
+#registerForm > h2{
+  font-size: .52rem;
+  font-weight: bold;
+  letter-spacing: .2rem;
+  font-size: 24px;
+}
+
+#registerForm > *{
+  /* background-color: violet; */
+  margin: 10px;
 }
 /*  
 
@@ -72,12 +91,25 @@ h3 {
   padding: 1rem;
 }
 
+*/
 
-p {
-  font-family: 'IBM Plex Sans', sans-serif
-}
 #registerForm > input {
   height: 48px;
   border-radius: 11px;
-  width: 100%;
-} */
+  width: 80%; 
+  /* margin-left: 10%; */
+  /* margin-right: 10%; */ 
+  border:0px solid #cccccc;
+  appearance: none;
+  -moz-appearance: none;
+  -webkit-appearance: none;
+} 
+
+#registerForm > input[type='submit'] {
+  font-size: 48px;
+  font-weight: bold;
+  /* background-color: #ffffff; */
+  color: #094067;
+  height: 80px;
+  width: 60%;
+}
