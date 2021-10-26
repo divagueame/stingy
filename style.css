@@ -19,9 +19,14 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  overflow-y: hidden;
   /* align-items: center; */
 }
-
+header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 h1 {
   font-family: "Tw Cen MT";
   font-size: 96px;
@@ -46,8 +51,19 @@ h3 {
 #registerForm {
   background-color: #094067;
   border-radius: 11px 11px 0 0;
+  height: 40vh;
+  padding: 20px;
+}
+#registerForm > *{
+  /* padding: 20px; */
+  /* margin: 2rem; */
 }
 
 p {
   font-family: 'IBM Plex Sans', sans-serif
+}
+#registerForm > input {
+  height: 48px;
+  border-radius: 11px;
+  width: 100%;
 }
