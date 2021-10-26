@@ -1,3 +1,8 @@
+@import url('http://db.onlinewebfonts.com/c/9b62dc86f936227b3f7b367bd0b6c05e?family=Tw+Cen+MT');
+@import url('https://fonts.googleapis.com/css2?family=Karma:wght@600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500&display=swap');
+
+
 *,body {
   margin: 0;
   padding: 0;
@@ -9,19 +14,25 @@
 
 #loggedOutWrapper {
   height: 100vh;
-  /* background-color: chocolate; */
-  /* display: flex; */
-  /* justify-content: center; */
+  background-image: url('./img/mobile-bg1.svg');
+  border: 9px white solid;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   /* align-items: center; */
 }
-/* 
-#registerForm {
-  width: 25%;
-  height: 50vh;
-  border: rgb(255, 221, 221) 4px solid;
-  /* display: flex; */
-  /* flex-direction: column; */
-/* } */
+
+h1 {
+  font-family: "Tw Cen MT";
+  font-size: 96px;
+  color: #094067;
+}
+h3 {
+  font-family: 'Karma', serif;
+  font-size: 18px;
+  color: #ffffff;
+}
+
 
 #loggedInWrapper {
   background-color: bisque;
@@ -32,3 +43,11 @@
   padding: 1rem;
 }
 
+#registerForm {
+  background-color: #094067;
+  border-radius: 11px 11px 0 0;
+}
+
+p {
+  font-family: 'IBM Plex Sans', sans-serif
+}
