@@ -26,11 +26,12 @@ html, body {
 
 #loggedOutWrapper {
   /* max-height: 100vh; */
+  height: 100%;
   background-image: url('./img/mobile-bg1.svg');
-  /* border: 9px white solid; */
+  border: 9px white solid;
   display: flex;
   flex-direction: column;
-  /* justify-content: space-between; */
+  justify-content: space-between;
   /* overflow-y: hidden; */
   /* align-items: center; */
 }
