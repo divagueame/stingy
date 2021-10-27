@@ -33,7 +33,8 @@ a {
   /* max-height: 100vh; */
   height: 100%;
   background-image: url('./img/mobile-bg1.svg');
-  /* border: 9px white solid; */
+  background-repeat: no-repeat;
+  background-size: cover;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -81,17 +82,7 @@ h3 {
   /* background-color: violet; */
   margin: 10px;
 }
-/*  
 
-#loggedInWrapper {
-  background-color: bisque;
-  justify-content: flex-start;
-  align-items: center;
-  flex-direction: column;
-  padding: 1rem;
-}
-
-*/
 
 #registerForm > input {
   height: 48px;
@@ -104,12 +95,46 @@ h3 {
   -moz-appearance: none;
   -webkit-appearance: none;
 } 
+#registerForm > input[type='text'], #registerForm > input[type='password']{
+  padding: 20px;
+  font-size: 20px;
+  font-family: 'IBM Plex Sans', sans-serif;
+  /* color: #cccccc; */
+}
+
+#registerForm > input[type='text']:focus, #registerForm > input[type='password']:focus {
+  
+  outline: none;
+}
 
 #registerForm > input[type='submit'] {
   font-size: 48px;
   font-weight: bold;
-  /* background-color: #ffffff; */
   color: #094067;
   height: 80px;
   width: 60%;
+}
+
+
+/* Bigger screen adjustments */
+@media only screen and (min-width: 600px) {
+    #loggedOutWrapper {
+    background-image: url('./img/desktop-bg1.svg');
+    background-repeat: no-repeat;
+    background-size: cover;
+    
+  }
+  #registerForm {
+    border-radius: 11px;
+  } 
+
+  #loggedOutWrapper > header{
+    margin-top: 5%;
+  }
+  #loggedOutWrapper > .formDiv {
+    
+    margin-bottom: 15%;
+    margin-left: 25%;
+    margin-right: 25%;
+  }
 }
