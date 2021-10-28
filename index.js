@@ -74,7 +74,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
       let newbillbtn = document.createElement('button') 
       newbillbtn.innerHTML = 'Add new shared bill';
       newbillbtn.setAttribute('id', 'newbill-btn')
-      loggedInWrapper.insertBefore(newbillbtn, loggedInWrapper.firstChild);
+      // loggedInWrapper.insertBefore(newbillbtn, loggedInWrapper.firstChild);
       // loggedInWrapper.appendChild(newbillbtn)
 
       let currentsharedbillsbtn = document.createElement('button') 
@@ -84,7 +84,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
         getCurrentSharedBills(user)
       })
       // loggedInWrapper.appendChild(currentsharedbillsbtn)
-      loggedInWrapper.insertBefore(currentsharedbillsbtn, loggedInWrapper.firstChild);
+      // loggedInWrapper.insertBefore(currentsharedbillsbtn, loggedInWrapper.firstChild);
       userInfoDiv.innerHTML = user.email + " "  + user.uid
       
       newbillbtn.addEventListener('click', function(){
@@ -110,14 +110,14 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
       let newbillbtn = document.getElementById('newbill-btn')
       if(newbillbtn){
-        newbillbtn.parentElement.removeChild(newbillbtn)
+        // newbillbtn.parentElement.removeChild(newbillbtn)
       }
       
 
       
       let currentsharedbillsbtn = document.getElementById('currentsharedbills-btn')
       if(currentsharedbillsbtn){
-        currentsharedbillsbtn.parentElement.removeChild(currentsharedbillsbtn)
+        // currentsharedbillsbtn.parentElement.removeChild(currentsharedbillsbtn)
       }
       
       currentBillsDiv.innerHTML = '';
@@ -232,12 +232,12 @@ function renderBill(bill){
     retrieveUserName(userId).then((userName)=>{
       
       usersDiv.innerHTML = userName
-      thisBillDiv.appendChild(usersDiv)
+      // thisBillDiv.appendChild(usersDiv)
     })
     
     
   })
-  currentBillsDiv.appendChild(thisBillDiv)
+  // currentBillsDiv.appendChild(thisBillDiv)
 
   thisBillDiv.addEventListener('click', function(){
     renderCurrentBillInfo(bill)
@@ -263,14 +263,14 @@ function renderCurrentBillInfo(bill){
   addMoveBtn.innerHTML = "+"
   let newAmmountMove = 69
   let newConcept = "Good stuff"
-  currentBillInfo.appendChild(addMoveBtn)
+  // currentBillInfo.appendChild(addMoveBtn)
   // addNewMove(bill,newAmmountMove, newConcept)
   
   
   //Add friend btn
   let addUserBtn = document.createElement('button')
   addUserBtn.innerHTML = "Add a friend to this bill"
-  currentBillInfo.appendChild(addUserBtn)
+  // currentBillInfo.appendChild(addUserBtn)
 
   addUserBtn.addEventListener('click', function(){
     toggleInputPanel()
@@ -294,7 +294,7 @@ function renderCurrentBillInfo(bill){
 
     //Create hidden panel to add new user to a bill
     let newUserPanel = createNewPanel()
-    currentBillInfo.appendChild(newUserPanel)
+    // currentBillInfo.appendChild(newUserPanel)
 
 }
 
@@ -314,8 +314,8 @@ function renderBillHeader(bill){
     textDiv.innerText = ''
     let dotsDiv = document.createElement('div')
     dotsDiv.classList.add("dots")
-    returnDiv.appendChild(textDiv)
-    returnDiv.appendChild(dotsDiv)
+    // returnDiv.appendChild(textDiv)
+    // returnDiv.appendChild(dotsDiv)
   return returnDiv
 }
 
@@ -360,7 +360,7 @@ function createNewPanel(){
   emailInput.classList.add('add-email-text-input')
   emailInput.setAttribute('type','text')
   // emailInput.autofocus = true
-  panel.appendChild(emailInput)
+  // panel.appendChild(emailInput)
   return panel
 }
 

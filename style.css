@@ -8,6 +8,11 @@ html, body {
   padding:0; /* remove default padding */
   width:100%; /* take full browser width */
   height:100%; /* take full browser height*/
+  color: #25496C;
+  /* font-family: 'IBM Plex Sans', sans-serif; */
+  font-family: "Tw Cen MT";
+  font-weight: 500;
+  font-size: 16px;
 }
 
 *,body {
@@ -15,8 +20,6 @@ html, body {
   padding: 0;
   box-sizing: border-box;
 }
-
-
 
 a {
   color: white;
@@ -27,15 +30,9 @@ a {
   display: none;
   width: 100%;
   height: 100%;
-}
-
-#loggedOutWrapper {
-  /* max-height: 100vh; */
-  height: 100%;
   background-image: url('./img/mobile-bg1.svg');
   background-repeat: no-repeat;
   background-size: cover;
-  display: flex;
   flex-direction: column;
   justify-content: space-between;
   
@@ -116,6 +113,58 @@ h3 {
 }
 
 
+/* Logged in user */
+
+#loggedInWrapper {
+  background-image: url('./img/mobile-bg2.svg');
+  justify-content: flex-start;
+}
+
+.title, .menu-buttons {
+  display: none;
+}
+.menu-buttons {
+  /* display: flex; */
+  /* flex-direction: row; */
+  /* position: absolute; */
+}
+#loggedInWrapper > nav {
+  display: flex;
+  justify-content: flex-end;
+}
+/* #loggedInWrapper > nav >  */
+.menu-dots {
+  display: flex;
+  padding: .4rem;
+}
+#loggedInWrapper > nav > .menu-dots > span {
+  display: block;
+  background-color: #ffffff;
+  border-radius: 50%;
+  width: .2rem;
+  height: .2rem;
+  margin-left: .1rem;
+}
+
+.bills-list {
+  padding: 0.7rem;
+}
+.your-bills {
+  background-color: white;
+  font-size: 1.375rem;
+}
+.bill-wrapper {
+  /* background-color: burlywood; */
+  background-image: url('./img/bill-card.svg');
+  background-repeat: no-repeat;
+  background-size: cover;
+  border-radius: 5px;
+}
+.bill-balance-amount {
+  color:white;
+  font-weight: bold;
+}
+
 /* Bigger screen adjustments */
 @media only screen and (min-width: 600px) {
     #loggedOutWrapper {
@@ -136,5 +185,28 @@ h3 {
     margin-bottom: 15%;
     margin-left: 25%;
     margin-right: 25%;
+  }
+
+  #loggedInWrapper > nav {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .title, .menu-buttons { 
+    display: flex;
+  }
+  .title{
+    flex-direction: column;
+  }
+  .menu-buttons {
+    /* display: block; */
+  }
+  
+  .menu-buttons {
+    position: default;
+  }
+  
+  #loggedInWrapper > nav > .menu-dots{
+    display: none;
   }
 }
