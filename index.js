@@ -21,8 +21,11 @@ const auth = getAuth();
 
 const registerForm = document.getElementById('registerForm')
 const logoutbtn = document.getElementById('logout-btn')
+const logoutbtnWrapper = document.querySelector('.logout-btn-wrapper')
 const loggedInWrapper = document.getElementById('loggedInWrapper')
 const loggedOutWrapper = document.getElementById('loggedOutWrapper')
+const menuDots = document.querySelector('.menu-dots');
+const menuButtons = document.querySelector('.menu-buttons');
 
 // const userInfoDiv = document.getElementById('userInfoDiv')
 const currentBillsDiv = document.getElementById('currentBillsDiv')
@@ -71,6 +74,13 @@ window.addEventListener('DOMContentLoaded', (event) => {
       loggedOutWrapper.style.display = 'none'
       loggedInWrapper.style.display = 'flex'
       
+      // const menuDots = document.querySelector('.menu-dots');
+      menuButtons.style.display = 'none'
+
+      menuDots.addEventListener('click', function(){
+        menuButtons.style.display = 'flex '
+      })
+
       let newbillbtn = document.createElement('button') 
       newbillbtn.innerHTML = 'Add new shared bill';
       newbillbtn.setAttribute('id', 'newbill-btn')
@@ -85,11 +95,21 @@ window.addEventListener('DOMContentLoaded', (event) => {
       })
       // loggedInWrapper.appendChild(currentsharedbillsbtn)
       // loggedInWrapper.insertBefore(currentsharedbillsbtn, loggedInWrapper.firstChild);
-      userInfoDiv.innerHTML = user.email + " "  + user.uid
+      // userInfoDiv.innerHTML = user.email + " "  + user.uid
       
       newbillbtn.addEventListener('click', function(){
         addNewBill(user)
         getCurrentSharedBills(user)
+      })
+
+      logoutbtnWrapper.addEventListener('click', (e)=>{
+        signOut(auth).then(() => {
+          // Sign-out successful.
+          console.log("USER IS LOGGED OUT")
+        }).catch((error) => {
+          // An error happened.
+          console.log("COuldnt log out user")
+        });
       })
 
       logoutbtn.addEventListener('click', function(){

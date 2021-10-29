@@ -108,6 +108,7 @@ h3 {
   color: #094067;
   height: 80px;
   width: 60%;
+  cursor: pointer;
 }
 
 
@@ -147,7 +148,7 @@ h3 {
 
 
 .bills-list {
-  padding: 0.7rem;
+padding: 0 0.7rem;
  display: flex; 
  flex-direction: column;
 }
@@ -233,23 +234,44 @@ h3 {
   width: 1.25rem;
   height: 1.25rem;
 }
+.over-balance {
+  width: 100%;
+  border-radius: 11px 11px 0 0;
+   /* position: absolute; */
+   /* top: -90%; */
+  /* top: -200%; */
+  /* height: 110px; */
+  /* background-color: teal; */
+  /* background: linear-gradient(rgba(113, 140, 160, 0.76)),rgba(135, 180, 212,1); */
+  /* background: linear-gradient(to top,  rgba(255, 255, 255, 1) 0%, rgba(0, 0, 0, 0) 100%); W3C */
+}
 .balance {
   position: -webkit-sticky;
-position: sticky;
-bottom: 20px;
-  /* bottom: 0; */
+  position: sticky;
+  /* bottom: -201px; */
+  bottom: 0;
   color: white;
   background-color: #094067;
   border-radius: 11px 11px 0 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-items: flex-start;
+  font-family: 'IBM Plex Sans', sans-serif;
 }
-.balance h2 {
+.balance h3 {
   color: white;
   background-color: #EA92B7;
-  margin: 1rem;
-  padding: .5rem;
+  /* margin: .31rem; */
+  /* padding: .55rem; */
   border-radius: 5px;
+  position: absolute;
+  top: -1rem;
+  font-family: 'IBM Plex Sans', sans-serif;
 }
-
+.balance h2 {
+  /* background-color: teal; */
+}
 /* Bigger screen adjustments */
 @media only screen and (min-width: 600px) {
     #loggedOutWrapper {
@@ -283,10 +305,6 @@ bottom: 20px;
   .title{
     flex-direction: column;
   }
-  .menu-buttons {
-    /* display: block; */
-  }
-  
   .menu-buttons {
     position: default;
   }
