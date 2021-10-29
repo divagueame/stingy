@@ -35,7 +35,6 @@ a {
   background-size: cover;
   flex-direction: column;
   justify-content: space-between;
-  
 }
 
 header {
@@ -48,7 +47,6 @@ header {
 h1 {
   font-family: "Tw Cen MT";
   font-size: 96px;
-  color: #094067;
 }
 h3 {
   font-family: 'Karma', serif;
@@ -123,14 +121,15 @@ h3 {
 .title, .menu-buttons {
   display: none;
 }
-.menu-buttons {
-  /* display: flex; */
-  /* flex-direction: row; */
-  /* position: absolute; */
-}
+
 #loggedInWrapper > nav {
   display: flex;
   justify-content: flex-end;
+}
+
+#loggedInWrapper > section {
+  /* background-color: tan; */
+  /* height: 500px; */
 }
 /* #loggedInWrapper > nav >  */
 .menu-dots {
@@ -146,22 +145,30 @@ h3 {
   margin-left: .1rem;
 }
 
+
 .bills-list {
   padding: 0.7rem;
-  
+ display: flex; 
+ flex-direction: column;
 }
 
-.basic-shadow {
-  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
-} 
+
+.shadow {
+  -webkit-filter: drop-shadow( 0px 4px 4px rgba(0, 0, 0, .25));
+  filter: drop-shadow( 0px 4px 4px rgba(0, 0, 0, .25));
+  /* Similar syntax to box-shadow */
+}
+
 .your-bills {
   background-color: white;
-  font-size: 1.375rem;
+  padding: .5rem;
+  font-size: .8rem;
   display: flex;
   justify-content: center;
   align-items: center;
   border-radius: 5px;
   margin-bottom: 1.2rem;
+  color: #4B739A;
 }
 .bill-wrapper {
   background-image: url('./img/bill-card.svg');
@@ -184,6 +191,18 @@ h3 {
 }
 .bill-balance-title {
   color: #FFC7C7;
+  display: flex;
+  justify-items: center;
+  align-items: center;
+}
+.bill-balance-dot{
+  display: block;
+  background-color: #FFC7C7;
+  border-radius: 50%;
+  width: .2rem;
+  height: .2rem;
+  margin-right: 0.1rem;
+
 }
 .bill-balance-amount {
   color:white;
@@ -200,6 +219,7 @@ h3 {
   padding-left: 2rem;
   align-items: center;
   justify-content: flex-start;
+  margin-bottom: 1rem;
 }
 .new-bill-wrapper h2{
   margin-left: .2rem;
@@ -214,8 +234,10 @@ h3 {
   height: 1.25rem;
 }
 .balance {
-  position: absolute;
-  bottom: 0;
+  position: -webkit-sticky;
+position: sticky;
+bottom: 20px;
+  /* bottom: 0; */
   color: white;
   background-color: #094067;
   border-radius: 11px 11px 0 0;
@@ -224,11 +246,8 @@ h3 {
   color: white;
   background-color: #EA92B7;
   margin: 1rem;
-  position: absolute;
-  top: -2rem;
   padding: .5rem;
   border-radius: 5px;
-  /* display: none; */
 }
 
 /* Bigger screen adjustments */
