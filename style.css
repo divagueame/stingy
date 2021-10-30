@@ -313,6 +313,9 @@ padding: 0 0.7rem;
 
 /* Bigger screen adjustments */
 @media only screen and (min-width: 600px) {
+  html, body {
+    /* font-size: 5px; */
+  }
     #loggedOutWrapper {
     background-image: url('./img/desktop-bg1.svg');
     background-repeat: no-repeat;
