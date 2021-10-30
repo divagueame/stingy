@@ -75,19 +75,20 @@ window.addEventListener('DOMContentLoaded', (event) => {
       loggedInWrapper.style.display = 'flex'
       
       // const menuDots = document.querySelector('.menu-dots');
-      menuButtons.style.display = 'none'
-      menuDots.style.display = 'flex'
+      // menuButtons.style.display = 'none'
+      // menuDots.style.display = 'flex'
 
       window.addEventListener('click', function(e){
-        // console.log(menuDots)
+        console.log(menuDots)
         if (((e.target).parentElement==menuDots)||((e.target)==menuDots)){ // Open menu
-          menuDots.style.display = 'none'
-          menuButtons.style.display = 'flex'
-          menuButtons.classList.toggle('menu-buttons-mobile')
+          // menuDots.style.display = 'none'
+          // menuButtons.style.display = 'flex'
+          menuButtons.classList.add('menu-buttons-show')
         }else { //Close menu
-          menuDots.style.display = 'flex'
-          menuButtons.style.display = 'none '
-          menuButtons.classList.toggle('menu-buttons-mobile')
+          // menuDots.style.display = 'flex'
+          // menuButtons.style.display = 'none '
+          
+          menuButtons.classList.remove('menu-buttons-show')
         }
       })
       
