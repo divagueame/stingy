@@ -76,10 +76,21 @@ window.addEventListener('DOMContentLoaded', (event) => {
       
       // const menuDots = document.querySelector('.menu-dots');
       menuButtons.style.display = 'none'
+      menuDots.style.display = 'flex'
 
-      menuDots.addEventListener('click', function(){
-        menuButtons.style.display = 'flex '
+      window.addEventListener('click', function(e){
+        // console.log(menuDots)
+        if (((e.target).parentElement==menuDots)||((e.target)==menuDots)){ // Open menu
+          menuDots.style.display = 'none'
+          menuButtons.style.display = 'flex'
+          menuButtons.classList.toggle('menu-buttons-mobile')
+        }else { //Close menu
+          menuDots.style.display = 'flex'
+          menuButtons.style.display = 'none '
+          menuButtons.classList.toggle('menu-buttons-mobile')
+        }
       })
+      
 
       let newbillbtn = document.createElement('button') 
       newbillbtn.innerHTML = 'Add new shared bill';
