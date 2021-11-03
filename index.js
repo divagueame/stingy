@@ -1,7 +1,7 @@
 import {initializeApp} from "https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js"
-import {getFirestore, doc, arrayUnion,setDoc, updateDoc, collection, query, where, getDoc, getDocs, addDoc} from "https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore.js"
+import {getFirestore, onSnapshot, doc, arrayUnion,setDoc, updateDoc, collection, query, where, getDoc, getDocs, addDoc} from "https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore.js"
 import {getAuth, onAuthStateChanged,createUserWithEmailAndPassword, signInWithEmailAndPassword,signOut, GoogleAuthProvider, signInWithRedirect} from "https://www.gstatic.com/firebasejs/9.1.3/firebase-auth.js"
-
+// import { copyFileSync } from "fs";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDFH-HvSyQ2nL2V0XWMV1dFyVrgna_HzBI",
@@ -73,13 +73,29 @@ window.addEventListener('DOMContentLoaded', (event) => {
       const uid = user.uid;
       loggedOutWrapper.style.display = 'none'
       loggedInWrapper.style.display = 'flex'
+      //On start, get current user
+      let userO = getUserObj(user)
+      
+      userO.then((userObj)=>{
+        
+       getCurrentSharedBills(userObj.userInfo[0])
+        
+          
+        
+        
+        
+      
+        
+        
+      })
+      
       
       // const menuDots = document.querySelector('.menu-dots');
       // menuButtons.style.display = 'none'
       // menuDots.style.display = 'flex'
 
       window.addEventListener('click', function(e){
-        console.log(menuDots)
+        // console.log(menuDots)
         if (((e.target).parentElement==menuDots)||((e.target)==menuDots)){ // Open menu
           // menuDots.style.display = 'none'
           // menuButtons.style.display = 'flex'
@@ -145,8 +161,6 @@ window.addEventListener('DOMContentLoaded', (event) => {
         // newbillbtn.parentElement.removeChild(newbillbtn)
       }
       
-
-      
       let currentsharedbillsbtn = document.getElementById('currentsharedbills-btn')
       if(currentsharedbillsbtn){
         // currentsharedbillsbtn.parentElement.removeChild(currentsharedbillsbtn)
@@ -158,9 +172,15 @@ window.addEventListener('DOMContentLoaded', (event) => {
   })
 } )
 
-function dbAddNewUser(user){
+async function dbAddNewUser(user){
   let userArray = [user.uid,user.email]
   let userName = user.email.match(/^(.*?)\@/)
+  await setDoc(doc(db, "users", user.uid), {
+    'userInfo': userArray,
+    'userName': userName[1]
+  });
+  return
+
   const docRef = addDoc(collection(db, "users"), {
     'userInfo': userArray,
     'userName': userName[1]
@@ -234,21 +254,82 @@ function retrieveUserName(id){
 }
 
 
-function getCurrentSharedBills(user){
-  if(currentBillsDiv.innerHTML!=''){
-    currentBillsDiv.textContent = ''
-  }
-   let thisUserId = user.uid
-  const q = query(collection(db, "bills"), where("users", "array-contains", thisUserId));
- 
-  getDocs(q).then((es)=>{
-    es.forEach((doc) => {
-      renderBill(doc)
+async function getCurrentSharedBills(userId){
+  const bills = [];  
+  const q = query(collection(db, "bills"), where("users", "array-contains", userId));
+  onSnapshot(q, (querySnapshot) => {
+    querySnapshot.forEach((doc) => {
+      bills.push(doc.data());
     });
     
+    // console.log("The bills of this user are: ", bills);
+    bills.forEach(bill=>{
+      
+      let thisBalance = calculate_balance(bill.moves,userId)
+      renderBillTitle(bill.users,thisBalance)
+      // console.log(bill,thisBalance)
+    })
+    // return bills
   })
 }
 
+function calculate_balance(movesArray,thisUserId){
+  let balance = 0;
+  movesArray.forEach((move)=>{
+    if(move.user==thisUserId){
+      balance += move.ammount
+    }else {
+      balance -= move.ammount
+    }
+  })
+// console.log(`This bill total balance is : ${balance}`)
+  return balance
+}
+
+function renderBillTitle(names,balance){
+  // console.log("RENDER TITLE", names, balance)
+  let namesTitle = '';
+  names.forEach((name)=>{namesTitle = namesTitle + " & " + name});
+  namesTitle = namesTitle.substr(0,10)
+  namesTitle += '...'
+
+  // console.log(namesTitle)
+  const billWrapper = document.createElement('div')
+  billWrapper.classList.add("bill-wrapper")
+  billWrapper.classList.add("shadow")
+    const billh2 = document.createElement('h2');
+    billh2.innerHTML = namesTitle;
+    const billBalance = document.createElement('div')
+    billBalance.classList.add("bill-balance");
+      const billBalanceTitle = document.createElement('div')
+      billBalanceTitle.classList.add("bill-balance-title");
+        const billBalanceDot = document.createElement('span')
+        const billBalanceText = document.createElement('p');
+      const billBalanceAmount = document.createElement('div')
+      billBalanceAmount.classList.add("bill-balance-amount");
+      billBalanceAmount.innerHTML= balance;
+
+
+  billWrapper.appendChild(billh2)
+  billWrapper.appendChild(billBalance)
+    billBalance.appendChild(billBalanceTitle)
+      billBalanceTitle.appendChild(billBalanceDot)
+      billBalanceTitle.appendChild(billBalanceText)
+    billBalance.appendChild(billBalanceAmount)
+
+    document.querySelector(".bills-list").appendChild(billWrapper)
+  // <div class="bill-wrapper shadow">
+  //           <h2>Ola & Martin</h2>
+  //           <div class="bill-balance">
+  //             <div class="bill-balance-title">
+  //               <span class="bill-balance-dot"></span>
+  //               <p>Balance</p>
+  //             </div>
+  //             <div class="bill-balance-amount">-134,24€</div>
+  //           </div>
+  //         </div>
+
+}
 
 function renderBill(bill){
   // currentBillsDiv.textContent = ""
@@ -400,4 +481,44 @@ function toggleInputPanel(){
   document.querySelector('.add-new-user-panel').classList.toggle('hidden-panel');
   document.querySelector('.add-email-text-input').focus()
 }
+
+async function getUserObj(user){ 
+  // console.log("ANd", user.uid)
+const docRef = doc(db, "users", user.uid);
+const docSnap = await getDoc(docRef);
+
+if (docSnap.exists()) {
+  // console.log("Document data:", docSnap.data());
+  return docSnap.data()
+} else {
+  // doc.data() will be undefined in this case
+  console.log("No such document!");
+}
+
+}
+
+async function userBillsData(user){ 
+      
+    const q = query(collection(db, "bills"), where("users", "array-contains", user.uid));
+    let myBills = await onSnapshot(q, (querySnapshot) => {
+      let bills = []
+      querySnapshot.forEach((bill) => {
+        
+        let billObj = bill.data()
+        bills.push(billObj)
+      });
+      console.log(bills)
+      // return bills; 
+    }
+    )
+    
+    // console.log("Current bills: ", myBills)
+    return myBills
+
+    
+  
+  
+}
+
+
 
