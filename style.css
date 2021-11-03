@@ -327,13 +327,13 @@ padding: 0 0.7rem;
   /* background-color: turquoise; */
 }
 
-.bill-move-description-ammount {
+.bill-move-description-amount {
   /* background-color: rgb(27, 150, 103); */
   /* width: 100%; */
   display: flex;
   justify-content: flex-end;
 }
-.bill-move-description-ammount  > span{
+.bill-move-description-amount  > span{
   /* background-color: rgb(220, 255, 242); */
   /* position: relative; */
   /* right: 0; */

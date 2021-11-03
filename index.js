@@ -216,13 +216,13 @@ function addNewBill(user){
 
 }
 
-function createPaymentObj(userId,payedAmmount,paymentConcept){
+function createPaymentObj(userId,payedAmount,paymentConcept){
   // console.log("Create")
   // console.log(userId)
   return {
     date: new Date(),
     user: userId,
-    ammount: payedAmmount,
+    amount: payedAmount,
     concept: paymentConcept
   }
 }
@@ -266,7 +266,8 @@ async function getCurrentSharedBills(userId){
     bills.forEach(bill=>{
       
       let thisBalance = calculate_balance(bill.moves,userId)
-      renderBillTitle(bill.users,thisBalance)
+      renderBillTitle(bill.users,thisBalance,bill);
+      renderBillContent(bill)
       // console.log(bill,thisBalance)
     })
     // return bills
@@ -277,23 +278,22 @@ function calculate_balance(movesArray,thisUserId){
   let balance = 0;
   movesArray.forEach((move)=>{
     if(move.user==thisUserId){
-      balance += move.ammount
+      balance += move.amount
     }else {
-      balance -= move.ammount
+      balance -= move.amount
     }
   })
 // console.log(`This bill total balance is : ${balance}`)
   return balance
 }
 
-function renderBillTitle(names,balance){
+function renderBillTitle(names,balance,bill){
   // console.log("RENDER TITLE", names, balance)
   let namesTitle = '';
   names.forEach((name)=>{namesTitle = namesTitle + " & " + name});
   namesTitle = namesTitle.substr(0,10)
   namesTitle += '...'
 
-  // console.log(namesTitle)
   const billWrapper = document.createElement('div')
   billWrapper.classList.add("bill-wrapper")
   billWrapper.classList.add("shadow")
@@ -307,8 +307,7 @@ function renderBillTitle(names,balance){
         const billBalanceText = document.createElement('p');
       const billBalanceAmount = document.createElement('div')
       billBalanceAmount.classList.add("bill-balance-amount");
-      billBalanceAmount.innerHTML= balance;
-
+      billBalanceAmount.innerHTML= `${balance}€`;
 
   billWrapper.appendChild(billh2)
   billWrapper.appendChild(billBalance)
@@ -317,18 +316,60 @@ function renderBillTitle(names,balance){
       billBalanceTitle.appendChild(billBalanceText)
     billBalance.appendChild(billBalanceAmount)
 
-    document.querySelector(".bills-list").appendChild(billWrapper)
-  // <div class="bill-wrapper shadow">
-  //           <h2>Ola & Martin</h2>
-  //           <div class="bill-balance">
-  //             <div class="bill-balance-title">
-  //               <span class="bill-balance-dot"></span>
-  //               <p>Balance</p>
-  //             </div>
-  //             <div class="bill-balance-amount">-134,24€</div>
-  //           </div>
-  //         </div>
+  document.querySelector(".bills-list").appendChild(billWrapper)
+  
+  billWrapper.addEventListener('click', (e)=>{
+    // e.stopPropagation()
+    e.stopImmediatePropagation()
+    console.log(bill)
+    // console.log(this)
+  })
 
+}
+
+function renderBillContent(bill){
+  console.log(bill.moves)
+  
+  let billMoveDescription = document.createElement('div')
+    let billMoveWrapper = document.createElement('div')
+    let billMoveHeader = document.createElement('div')
+    billMoveDescription.classList.add("bill-move-description");
+    billMoveWrapper.classList.add("bill-move-wrapper");
+    billMoveHeader.classList.add("shadow")
+    billMoveHeader.classList.add("bill-move-header")
+    billMoveHeader.innerHTML = "Title"
+    
+    
+  billMoveWrapper.appendChild(billMoveHeader)
+
+
+bill.moves.forEach((move)=>{
+  let thisMoveDetailsDiv = document.createElement('div')
+  thisMoveDetailsDiv.classList.add('bill-move-details')
+  let billMoveDescriptionConcept = document.createElement('div')
+  let billMoveDescriptionAmount = document.createElement('div')
+  let billMoveDescriptionAuthor = document.createElement('div')
+  let billMoveDescriptionDelete = document.createElement('div')
+  billMoveDescriptionConcept.classList.add('bill-move-description-concept')
+  billMoveDescriptionAmount.classList.add('bill-move-description-amount')
+  billMoveDescriptionAuthor.classList.add('bill-move-description-author')
+  billMoveDescriptionDelete.classList.add('bill-move-description-delete-btn')
+
+  billMoveDescriptionConcept.innerHTML = move.concept
+  billMoveDescriptionAmount.innerHTML = move.ammount
+  billMoveDescriptionAuthor.innerHTML = move.author
+  billMoveDescriptionDelete.innerHTML = 'x'
+
+  thisMoveDetailsDiv.appendChild(billMoveDescriptionConcept)
+  thisMoveDetailsDiv.appendChild(billMoveDescriptionAmount)
+  thisMoveDetailsDiv.appendChild(billMoveDescriptionAuthor)
+  thisMoveDetailsDiv.appendChild(billMoveDescriptionDelete)
+  billMoveWrapper.appendChild(thisMoveDetailsDiv)
+})
+
+billMoveDescription.appendChild(billMoveWrapper)
+let billDetailsDisplay = document.querySelector(".bill-details-display")
+billDetailsDisplay.appendChild(billMoveDescription)
 }
 
 function renderBill(bill){
@@ -374,10 +415,10 @@ function renderCurrentBillInfo(bill){
   //Add new move btn
   let addMoveBtn = document.createElement('button')
   addMoveBtn.innerHTML = "+"
-  let newAmmountMove = 69
+  let newAmountMove = 69
   let newConcept = "Good stuff"
   // currentBillInfo.appendChild(addMoveBtn)
-  // addNewMove(bill,newAmmountMove, newConcept)
+  // addNewMove(bill,newAmountMove, newConcept)
   
   
   //Add friend btn
@@ -434,22 +475,22 @@ function renderBillHeader(bill){
 
 function renderSingleMoveDiv(move){
   let concept = move['concept']
-  let ammount = move['ammount']
+  let amount = move['amount']
 
   let returnDiv = document.createElement('div')
   returnDiv.classList.add('singleMove')
-  returnDiv.innerHTML = `${concept}, ${ammount}`
+  returnDiv.innerHTML = `${concept}, ${amount}`
   // returnDiv.innerHTML += move['user']
   return returnDiv
 }
 
 
 
-function addNewMove(bill,ammount,paymentConcept){
+function addNewMove(bill,amount,paymentConcept){
   let userId = auth.currentUser.uid;
   let billRef = doc(db,"bills",bill.id)
   let movesArray = bill.data()['moves']
-  let newMove = createPaymentObj(userId,ammount,paymentConcept)
+  let newMove = createPaymentObj(userId,amount,paymentConcept)
   movesArray.push(newMove)
 
     
