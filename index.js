@@ -57,7 +57,6 @@ signInWithEmailAndPassword(auth, newUsername, newPassword)
       const errorMessage = error.message;
       console.log("Cannot create new account",errorCode)
       console.log(errorMessage)
-      // ..
     });
     const errorCode = error.code;
     const errorMessage = error.message;
@@ -77,21 +76,16 @@ window.addEventListener('DOMContentLoaded', (event) => {
       loggedInWrapper.style.display = 'flex'
       //On start, get current user
       let userO = getUserObj(user)
-
       
       userO.then((userObj)=>{
-        // console.log("This is ",userObj.userName)
+      // console.log("This is ",userObj.userName)
        getCurrentSharedBills(userObj.userInfo[0])
-        
-              //Add new bill btn
-      const newBillWrapper = document.querySelector(".new-bill-wrapper");
-      newBillWrapper.addEventListener('click', (e)=>{
-        
-        addNewBill(userObj)
 
+      //Add new bill btn
+      const newBillWrapper = document.querySelector(".new-bill-wrapper");
+      newBillWrapper.addEventListener('click', (e)=>{        
+        addNewBill(userObj)
       })
-        
-        
         
     
       })
@@ -141,12 +135,11 @@ window.addEventListener('DOMContentLoaded', (event) => {
           console.log("USER IS LOGGED OUT")
         }).catch((error) => {
           // An error happened.
-          console.log("COuldnt log out user")
+          console.log("Couldn't log out user")
         });
       })
 
       logoutbtn.addEventListener('click', function(){
-        console.log("Es")
             signOut(auth).then(() => {
               // Sign-out successful.
               console.log("USER IS LOGGED OUT")
@@ -232,17 +225,19 @@ function retrieveUserName(id){
 
 async function getCurrentSharedBills(userId){
   const bills = [];  
+  const ids = [];
   const q = query(collection(db, "bills"), where("users", "array-contains", userId));
   onSnapshot(q, (querySnapshot) => {
     querySnapshot.forEach((doc) => {
       bills.push(doc.data());
+      ids.push(doc.id)
     });
     
     // console.log("The bills of this user are: ", bills);
-    bills.forEach(bill=>{
+    bills.forEach((bill,i)=>{
       let thisBalance = calculate_balance(bill.moves,userId)
       renderBillTitle(bill.usernames,thisBalance);
-      renderBillContent(bill)
+      renderBillContent(bill,ids[i])
       // console.log(bill,thisBalance)
     })
     // return bills
@@ -307,7 +302,7 @@ function renderBillTitle(names,balance){
 
 }
 
-function renderBillContent(bill){
+function renderBillContent(bill,id){
   // console.log(bill.moves)
   
   let billMoveDescription = document.createElement('div')
@@ -357,15 +352,40 @@ let billDetailsDisplay = document.querySelector(".bill-details-display")
 billDetailsDisplay.appendChild(billMoveDescription)
 
 billNewmoveBtn.addEventListener('click', function(){
-  displayNewMoveWrapper(bill)
+  displayNewMoveWrapper(bill);
+  addNewMoveForm(bill,id)
+  
 })
 }
 
-function displayNewMoveWrapper(b){
-  console.log(b)
-  const newMoveWrapper = document.querySelector('.new-move-wrapper')
-  newMoveWrapper.classList.add('show-new-move-wrapper')
+function addNewMoveForm(bill,id){
+
+  // <form id="new-move-form" class="shadow" autocomplete="off">
+  //             <h2>Add a new move to the bill</h2>
+              
+  //             <input type="text" name="concept" placeholder="Concept" id="new-move-concept" autocomplete="concept">
+              
+  //             <input type="text" name="amount" placeholder="Amount" id="new-move-amount" autocomplete="amount">
+  //             <input type="submit" value="Add">
+  //           </form>
+
+  const newMoveForm = document.getElementById("new-move-form")
+newMoveForm.addEventListener('submit', function(e){
+  e.preventDefault();
+  e.stopImmediatePropagation()
+  let newConcept = document.getElementById('new-move-concept').value
+  let newAmount = document.getElementById('new-move-amount').value
+  // console.log(newConcept,newAmount,bill)
+  hideNewMoveWrapper()
+  addNewMove(bill,newAmount,newConcept,id)
 }
+)
+
+
+}
+
+
+
 
 function renderBill(bill){
   // currentBillsDiv.textContent = ""
@@ -481,13 +501,15 @@ function renderSingleMoveDiv(move){
 
 
 
-function addNewMove(bill,amount,paymentConcept){
+function addNewMove(bill,amount,paymentConcept,billId){
+  // console.log(bill)
   let userId = auth.currentUser.uid;
-  let billRef = doc(db,"bills",bill.id)
-  let movesArray = bill.data()['moves']
+  let billRef = doc(db,"bills",billId)
+  let movesArray = bill['moves']
+  // console.log("as",movesArray)
   let newMove = createPaymentObj(userId,amount,paymentConcept)
   movesArray.push(newMove)
-
+  // console.log(newMove)
     
   setDoc(billRef, { 'moves': movesArray }, { merge: true }).then((e)=>{
     console.log("Yes")
@@ -534,7 +556,6 @@ if (docSnap.exists()) {
 }
 
 async function userBillsData(user){ 
-      
     const q = query(collection(db, "bills"), where("users", "array-contains", user.uid));
     let myBills = await onSnapshot(q, (querySnapshot) => {
       let bills = []
@@ -547,14 +568,17 @@ async function userBillsData(user){
       // return bills; 
     }
     )
-    
     // console.log("Current bills: ", myBills)
     return myBills
-
-    
-  
-  
 }
 
+function displayNewMoveWrapper(b){
+  console.log(b)
+  const newMoveWrapper = document.querySelector('.new-move-wrapper')
+  newMoveWrapper.classList.add('show-new-move-wrapper')
+}
 
-
+function hideNewMoveWrapper(){
+  const newMoveWrapper = document.querySelector('.new-move-wrapper')
+  newMoveWrapper.classList.remove('show-new-move-wrapper')
+}
