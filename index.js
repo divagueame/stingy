@@ -1,6 +1,7 @@
 import {initializeApp} from "https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js"
 import {getFirestore, onSnapshot, doc, arrayUnion,setDoc, updateDoc, collection, query, where, getDoc, getDocs, addDoc} from "https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore.js"
 import {getAuth, onAuthStateChanged,createUserWithEmailAndPassword, signInWithEmailAndPassword,signOut, GoogleAuthProvider, signInWithRedirect} from "https://www.gstatic.com/firebasejs/9.1.3/firebase-auth.js"
+// import { setTimeout } from "timers/promises";
 // import { copyFileSync } from "fs";
 
 const firebaseConfig = {
@@ -28,7 +29,7 @@ const menuDots = document.querySelector('.menu-dots');
 const menuButtons = document.querySelector('.menu-buttons');
 
 // const userInfoDiv = document.getElementById('userInfoDiv')
-const currentBillsDiv = document.getElementById('currentBillsDiv')
+// const currentBillsDiv = document.getElementById('currentBillsDiv')
 
 
 registerForm.addEventListener('submit', function(e){
@@ -66,6 +67,7 @@ signInWithEmailAndPassword(auth, newUsername, newPassword)
 
 
 
+
 window.addEventListener('DOMContentLoaded', (event) => {
   onAuthStateChanged(auth, (user) => {
     //  User is logged in
@@ -75,18 +77,23 @@ window.addEventListener('DOMContentLoaded', (event) => {
       loggedInWrapper.style.display = 'flex'
       //On start, get current user
       let userO = getUserObj(user)
+
       
       userO.then((userObj)=>{
-        
+        // console.log("This is ",userObj.userName)
        getCurrentSharedBills(userObj.userInfo[0])
         
-          
+              //Add new bill btn
+      const newBillWrapper = document.querySelector(".new-bill-wrapper");
+      newBillWrapper.addEventListener('click', (e)=>{
+        
+        addNewBill(userObj)
+
+      })
         
         
         
-      
-        
-        
+    
       })
       
       
@@ -94,16 +101,21 @@ window.addEventListener('DOMContentLoaded', (event) => {
       // menuButtons.style.display = 'none'
       // menuDots.style.display = 'flex'
 
+
+
       window.addEventListener('click', function(e){
         // console.log(menuDots)
         if (((e.target).parentElement==menuDots)||((e.target)==menuDots)){ // Open menu
           // menuDots.style.display = 'none'
           // menuButtons.style.display = 'flex'
           menuButtons.classList.add('menu-buttons-show')
-        }else { //Close menu
+        }
+        // else if ((e.target)) {
+
+        // }
+        else { //Close menu
           // menuDots.style.display = 'flex'
           // menuButtons.style.display = 'none '
-          
           menuButtons.classList.remove('menu-buttons-show')
         }
       })
@@ -121,15 +133,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
       currentsharedbillsbtn.addEventListener('click', function(){
         getCurrentSharedBills(user)
       })
-      // loggedInWrapper.appendChild(currentsharedbillsbtn)
-      // loggedInWrapper.insertBefore(currentsharedbillsbtn, loggedInWrapper.firstChild);
-      // userInfoDiv.innerHTML = user.email + " "  + user.uid
       
-      newbillbtn.addEventListener('click', function(){
-        addNewBill(user)
-        getCurrentSharedBills(user)
-      })
-
+      
       logoutbtnWrapper.addEventListener('click', (e)=>{
         signOut(auth).then(() => {
           // Sign-out successful.
@@ -155,19 +160,6 @@ window.addEventListener('DOMContentLoaded', (event) => {
     } else {   //User is logged out
       loggedOutWrapper.style.display = 'flex'
       loggedInWrapper.style.display = 'none'
-
-      let newbillbtn = document.getElementById('newbill-btn')
-      if(newbillbtn){
-        // newbillbtn.parentElement.removeChild(newbillbtn)
-      }
-      
-      let currentsharedbillsbtn = document.getElementById('currentsharedbills-btn')
-      if(currentsharedbillsbtn){
-        // currentsharedbillsbtn.parentElement.removeChild(currentsharedbillsbtn)
-      }
-      
-      currentBillsDiv.innerHTML = '';
-      currentBillInfo.innerHTML = ''
     }
   })
 } )
@@ -179,35 +171,19 @@ async function dbAddNewUser(user){
     'userInfo': userArray,
     'userName': userName[1]
   });
-  return
-
-  const docRef = addDoc(collection(db, "users"), {
-    'userInfo': userArray,
-    'userName': userName[1]
-
-  }).then((e)=>{
-    console.log("Yes. Db user added", e)
-  }).catch((f)=>{
-    // console.log("No. Db user NOT added", f)
-  })
 }
 
-function addNewBill(user){
-  // console.log("Add  New bill",user.uid)
-  let thisUserId = user.uid
+function addNewBill(userObj){
+  console.log("Add  New bill",userObj)
+  console.log("Add  New bill",userObj.userInfo[0])
+  // let thisUserId = user.uid
   // console.log(thisUserId)
     const docRef = addDoc(collection(db, "bills"), {
-    users: [user.uid],
+    users: [userObj.userInfo[0]],
+    usernames: [userObj.userName],
     moves: [
-      createPaymentObj(thisUserId,1,"Is"),
-      // createPaymentObj(thisUserId,1,"Jess"),
-      // createPaymentObj(thisUserId,1,"Jess"),
-      createPaymentObj(thisUserId,121,"it"),
-      createPaymentObj(thisUserId,51,"clear"),
-      createPaymentObj(thisUserId,51,"now?"),
-      // createPaymentObj(thisUserId,532,"Dinner at BurgerKing"),
-      // createPaymentObj(thisUserId,52,"Beers"),
-      // createPaymentObj(thisUserId,2,"Ride"),
+      // createPaymentObj(thisUserId,1,"Is"),
+      // createPaymentObj(thisUserId,1,"Jess");
     ]
   }).then((e)=>{
     // console.log("Document written with ID: ", docRef.id);
@@ -264,9 +240,8 @@ async function getCurrentSharedBills(userId){
     
     // console.log("The bills of this user are: ", bills);
     bills.forEach(bill=>{
-      
       let thisBalance = calculate_balance(bill.moves,userId)
-      renderBillTitle(bill.users,thisBalance,bill);
+      renderBillTitle(bill.usernames,thisBalance);
       renderBillContent(bill)
       // console.log(bill,thisBalance)
     })
@@ -287,12 +262,17 @@ function calculate_balance(movesArray,thisUserId){
   return balance
 }
 
-function renderBillTitle(names,balance,bill){
-  // console.log("RENDER TITLE", names, balance)
+function renderBillTitle(names,balance){
   let namesTitle = '';
-  names.forEach((name)=>{namesTitle = namesTitle + " & " + name});
-  namesTitle = namesTitle.substr(0,10)
-  namesTitle += '...'
+  names.forEach((name,i)=>{
+    if(i==0){
+      namesTitle = name
+    }else {
+      namesTitle = namesTitle + " & " + name
+    }
+    });
+  // namesTitle = namesTitle.substr(0,15)
+  // namesTitle += '...'
 
   const billWrapper = document.createElement('div')
   billWrapper.classList.add("bill-wrapper")
@@ -319,16 +299,16 @@ function renderBillTitle(names,balance,bill){
   document.querySelector(".bills-list").appendChild(billWrapper)
   
   billWrapper.addEventListener('click', (e)=>{
-    // e.stopPropagation()
+    e.stopPropagation()
     e.stopImmediatePropagation()
-    console.log(bill)
+    console.log(e)
     // console.log(this)
   })
 
 }
 
 function renderBillContent(bill){
-  console.log(bill.moves)
+  // console.log(bill.moves)
   
   let billMoveDescription = document.createElement('div')
     let billMoveWrapper = document.createElement('div')
@@ -367,9 +347,24 @@ bill.moves.forEach((move)=>{
   billMoveWrapper.appendChild(thisMoveDetailsDiv)
 })
 
+  let billNewmoveBtn = document.createElement('button');
+  billNewmoveBtn.classList.add("add-new-move-btn")
+  billNewmoveBtn.classList.add("shadow")
+  billNewmoveBtn.innerHTML = "+"
+  billMoveWrapper.appendChild(billNewmoveBtn)
 billMoveDescription.appendChild(billMoveWrapper)
 let billDetailsDisplay = document.querySelector(".bill-details-display")
 billDetailsDisplay.appendChild(billMoveDescription)
+
+billNewmoveBtn.addEventListener('click', function(){
+  displayNewMoveWrapper(bill)
+})
+}
+
+function displayNewMoveWrapper(b){
+  console.log(b)
+  const newMoveWrapper = document.querySelector('.new-move-wrapper')
+  newMoveWrapper.classList.add('show-new-move-wrapper')
 }
 
 function renderBill(bill){
