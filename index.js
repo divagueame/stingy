@@ -78,25 +78,19 @@ window.addEventListener('DOMContentLoaded', (event) => {
       let userO = getUserObj(user)
       
       userO.then((userObj)=>{
-      // console.log("This is ",userObj.userName)
-       getCurrentSharedBills(userObj.userInfo[0])
-
-      //Add new bill btn
-      const newBillWrapper = document.querySelector(".new-bill-wrapper");
-      newBillWrapper.addEventListener('click', (e)=>{        
-        addNewBill(userObj)
-      })
-        
-    
+        // console.log("This is ",userObj.userName)
+        getCurrentSharedBills(userObj.userInfo[0])
+        //Add new bill btn
+        const newBillWrapper = document.querySelector(".new-bill-wrapper");
+        newBillWrapper.addEventListener('click', (e)=>{        
+          addNewBill(userObj)
+        })
       })
       
       
       // const menuDots = document.querySelector('.menu-dots');
       // menuButtons.style.display = 'none'
       // menuDots.style.display = 'flex'
-
-
-
       window.addEventListener('click', function(e){
         // console.log(menuDots)
         if (((e.target).parentElement==menuDots)||((e.target)==menuDots)){ // Open menu
@@ -104,9 +98,6 @@ window.addEventListener('DOMContentLoaded', (event) => {
           // menuButtons.style.display = 'flex'
           menuButtons.classList.add('menu-buttons-show')
         }
-        // else if ((e.target)) {
-
-        // }
         else { //Close menu
           // menuDots.style.display = 'flex'
           // menuButtons.style.display = 'none '
@@ -121,35 +112,33 @@ window.addEventListener('DOMContentLoaded', (event) => {
       // loggedInWrapper.insertBefore(newbillbtn, loggedInWrapper.firstChild);
       // loggedInWrapper.appendChild(newbillbtn)
 
-      let currentsharedbillsbtn = document.createElement('button') 
-      currentsharedbillsbtn.innerHTML = 'Show current shared bills';
-      currentsharedbillsbtn.setAttribute('id', 'currentsharedbills-btn')
-      currentsharedbillsbtn.addEventListener('click', function(){
-        getCurrentSharedBills(user)
-      })
+      // let currentsharedbillsbtn = document.createElement('button') 
+      // currentsharedbillsbtn.innerHTML = 'Show current shared bills';
+      // currentsharedbillsbtn.setAttribute('id', 'currentsharedbills-btn')
+      // currentsharedbillsbtn.addEventListener('click', function(){
+      //   getCurrentSharedBills(user)
+      // })
       
-      
-      logoutbtnWrapper.addEventListener('click', (e)=>{
-        signOut(auth).then(() => {
-          // Sign-out successful.
-          console.log("USER IS LOGGED OUT")
-        }).catch((error) => {
-          // An error happened.
-          console.log("Couldn't log out user")
-        });
-      })
+        
+        logoutbtnWrapper.addEventListener('click', (e)=>{
+          signOut(auth).then(() => {
+            // Sign-out successful.
+            console.log("USER IS LOGGED OUT")
+          }).catch((error) => {
+            // An error happened.
+            console.log("Couldn't log out user")
+          });
+        })
 
-      logoutbtn.addEventListener('click', function(){
-            signOut(auth).then(() => {
-              // Sign-out successful.
-              console.log("USER IS LOGGED OUT")
-            }).catch((error) => {
-              // An error happened.
-              console.log("COuldnt log out user")
-            });
-          })
-      
-
+        logoutbtn.addEventListener('click', function(){
+              signOut(auth).then(() => {
+                // Sign-out successful.
+                console.log("USER IS LOGGED OUT")
+              }).catch((error) => {
+                // An error happened.
+                console.log("COuldnt log out user")
+              });
+            })
     } else {   //User is logged out
       loggedOutWrapper.style.display = 'flex'
       loggedInWrapper.style.display = 'none'
@@ -167,8 +156,8 @@ async function dbAddNewUser(user){
 }
 
 function addNewBill(userObj){
-  console.log("Add  New bill",userObj)
-  console.log("Add  New bill",userObj.userInfo[0])
+  // console.log("Add  New bill",userObj)
+  // console.log("Add  New bill",userObj.userInfo[0])
   // let thisUserId = user.uid
   // console.log(thisUserId)
     const docRef = addDoc(collection(db, "bills"), {
@@ -185,12 +174,15 @@ function addNewBill(userObj){
 
 }
 
-function createPaymentObj(userId,payedAmount,paymentConcept){
+async function createPaymentObj(userId,payedAmount,paymentConcept){
   // console.log("Create")
   // console.log(userId)
+  let thisUsername = await (retrieveUserName(userId));
+  // console.log("Yes: thisis", thisUsername)
   return {
     date: new Date(),
     user: userId,
+    username: thisUsername,
     amount: payedAmount,
     concept: paymentConcept
   }
@@ -228,36 +220,65 @@ async function getCurrentSharedBills(userId){
   const ids = [];
   const q = query(collection(db, "bills"), where("users", "array-contains", userId));
   onSnapshot(q, (querySnapshot) => {
-    querySnapshot.forEach((doc) => {
-      bills.push(doc.data());
-      ids.push(doc.id)
-    });
+    querySnapshot.docChanges().forEach((change,i)=>{
+      if (change.type === "added") {
+        console.log("New bill: ", change.doc.data(), change.doc.id);
+          // bills.push(change.doc.data());
+          // ids.push(change.doc.id)
+      let theseMoves = change.doc.data()['moves'];
+      let theseUsers = change.doc.data()['usernames']
+      let thisBalance = calculate_balance(theseMoves,userId)
+      renderBillTitle(theseUsers,thisBalance,change.doc.id);
+      renderBillContent(change.doc.data(),change.doc.id)
+
+    }
+    if (change.type === "modified") {
+        console.log("Modified bill: ", change.doc.data());
+        let theseMoves = change.doc.data()['moves'];
+        let theseUsers = change.doc.data()['usernames']
+        let thisBalance = calculate_balance(theseMoves,userId);
+        removeBillTitle(change.doc.id);
+        removeBillContent(change.doc.id)
+
+        renderBillTitle(theseUsers,thisBalance,change.doc.id);
+        renderBillContent(change.doc.data(),change.doc.id)
+    }
+    if (change.type === "removed") {
+        console.log("Removed bill: ", change.doc.data());
+    }
     
-    // console.log("The bills of this user are: ", bills);
-    bills.forEach((bill,i)=>{
-      let thisBalance = calculate_balance(bill.moves,userId)
-      renderBillTitle(bill.usernames,thisBalance);
-      renderBillContent(bill,ids[i])
-      // console.log(bill,thisBalance)
-    })
-    // return bills
-  })
+  }
+      )
+    });
+}
+
+function removeBillTitle(id){
+  console.log("Remove this title: ", id)
+  let thisId = `billwrapper${id}`;
+  let elem = document.getElementById(thisId)
+  elem.parentElement.removeChild(elem)
+}
+function removeBillContent(id){
+  let thisId = `billmovedescription${id}`
+  let elem = document.getElementById(thisId)
+  elem.parentElement.removeChild(elem)
 }
 
 function calculate_balance(movesArray,thisUserId){
   let balance = 0;
   movesArray.forEach((move)=>{
     if(move.user==thisUserId){
-      balance += move.amount
+      balance += parseInt((move.amount))
     }else {
-      balance -= move.amount
+      balance -= parseInt((move.amount))
     }
   })
 // console.log(`This bill total balance is : ${balance}`)
   return balance
 }
 
-function renderBillTitle(names,balance){
+function renderBillTitle(names,balance,billId){
+  // console.log("WE",billId)
   let namesTitle = '';
   names.forEach((name,i)=>{
     if(i==0){
@@ -272,6 +293,8 @@ function renderBillTitle(names,balance){
   const billWrapper = document.createElement('div')
   billWrapper.classList.add("bill-wrapper")
   billWrapper.classList.add("shadow")
+  let wrapperId = `billwrapper${billId}`
+  billWrapper.setAttribute('id',wrapperId)
     const billh2 = document.createElement('h2');
     billh2.innerHTML = namesTitle;
     const billBalance = document.createElement('div')
@@ -295,52 +318,54 @@ function renderBillTitle(names,balance){
   
   billWrapper.addEventListener('click', (e)=>{
     e.stopPropagation()
-    e.stopImmediatePropagation()
-    console.log(e)
-    // console.log(this)
+    e.stopImmediatePropagation();
+    toggleBillMoveDescriptionDisplay(billId)
   })
 
 }
 
 function renderBillContent(bill,id){
-  // console.log(bill.moves)
-  
+  // console.log(bill,id)
   let billMoveDescription = document.createElement('div')
+  billMoveDescription.classList.add("hidden-bill-move-description");
+  
+  let billMoveDescriptionId = `billmovedescription${id}`
+  billMoveDescription.setAttribute('id',billMoveDescriptionId)
+
     let billMoveWrapper = document.createElement('div')
     let billMoveHeader = document.createElement('div')
     billMoveDescription.classList.add("bill-move-description");
     billMoveWrapper.classList.add("bill-move-wrapper");
     billMoveHeader.classList.add("shadow")
     billMoveHeader.classList.add("bill-move-header")
-    billMoveHeader.innerHTML = "Title"
-    
-    
+    billMoveHeader.innerHTML = "Title";
   billMoveWrapper.appendChild(billMoveHeader)
 
 
-bill.moves.forEach((move)=>{
-  let thisMoveDetailsDiv = document.createElement('div')
-  thisMoveDetailsDiv.classList.add('bill-move-details')
-  let billMoveDescriptionConcept = document.createElement('div')
-  let billMoveDescriptionAmount = document.createElement('div')
-  let billMoveDescriptionAuthor = document.createElement('div')
-  let billMoveDescriptionDelete = document.createElement('div')
-  billMoveDescriptionConcept.classList.add('bill-move-description-concept')
-  billMoveDescriptionAmount.classList.add('bill-move-description-amount')
-  billMoveDescriptionAuthor.classList.add('bill-move-description-author')
-  billMoveDescriptionDelete.classList.add('bill-move-description-delete-btn')
+  bill.moves.forEach((move)=>{
+    // console.log(move)
+    let thisMoveDetailsDiv = document.createElement('div')
+    thisMoveDetailsDiv.classList.add('bill-move-details')
+    let billMoveDescriptionConcept = document.createElement('div')
+    let billMoveDescriptionAmount = document.createElement('div')
+    let billMoveDescriptionAuthor = document.createElement('div')
+    let billMoveDescriptionDelete = document.createElement('div')
+    billMoveDescriptionConcept.classList.add('bill-move-description-concept')
+    billMoveDescriptionAmount.classList.add('bill-move-description-amount')
+    billMoveDescriptionAuthor.classList.add('bill-move-description-author')
+    billMoveDescriptionDelete.classList.add('bill-move-description-delete-btn')
 
-  billMoveDescriptionConcept.innerHTML = move.concept
-  billMoveDescriptionAmount.innerHTML = move.ammount
-  billMoveDescriptionAuthor.innerHTML = move.author
-  billMoveDescriptionDelete.innerHTML = 'x'
+    billMoveDescriptionConcept.innerHTML = move.concept
+    billMoveDescriptionAmount.innerHTML = (move.amount + "€")
+    billMoveDescriptionAuthor.innerHTML = move.username
+    billMoveDescriptionDelete.innerHTML = 'x'
 
-  thisMoveDetailsDiv.appendChild(billMoveDescriptionConcept)
-  thisMoveDetailsDiv.appendChild(billMoveDescriptionAmount)
-  thisMoveDetailsDiv.appendChild(billMoveDescriptionAuthor)
-  thisMoveDetailsDiv.appendChild(billMoveDescriptionDelete)
-  billMoveWrapper.appendChild(thisMoveDetailsDiv)
-})
+    thisMoveDetailsDiv.appendChild(billMoveDescriptionConcept)
+    thisMoveDetailsDiv.appendChild(billMoveDescriptionAmount)
+    thisMoveDetailsDiv.appendChild(billMoveDescriptionAuthor)
+    thisMoveDetailsDiv.appendChild(billMoveDescriptionDelete)
+    billMoveWrapper.appendChild(thisMoveDetailsDiv)
+  })
 
   let billNewmoveBtn = document.createElement('button');
   billNewmoveBtn.classList.add("add-new-move-btn")
@@ -359,29 +384,17 @@ billNewmoveBtn.addEventListener('click', function(){
 }
 
 function addNewMoveForm(bill,id){
-
-  // <form id="new-move-form" class="shadow" autocomplete="off">
-  //             <h2>Add a new move to the bill</h2>
-              
-  //             <input type="text" name="concept" placeholder="Concept" id="new-move-concept" autocomplete="concept">
-              
-  //             <input type="text" name="amount" placeholder="Amount" id="new-move-amount" autocomplete="amount">
-  //             <input type="submit" value="Add">
-  //           </form>
-
   const newMoveForm = document.getElementById("new-move-form")
-newMoveForm.addEventListener('submit', function(e){
-  e.preventDefault();
-  e.stopImmediatePropagation()
-  let newConcept = document.getElementById('new-move-concept').value
-  let newAmount = document.getElementById('new-move-amount').value
-  // console.log(newConcept,newAmount,bill)
-  hideNewMoveWrapper()
-  addNewMove(bill,newAmount,newConcept,id)
-}
-)
-
-
+  newMoveForm.addEventListener('submit', function(e){
+    e.preventDefault();
+    e.stopImmediatePropagation()
+    let newConcept = document.getElementById('new-move-concept').value
+    let newAmount = document.getElementById('new-move-amount').value
+    // console.log(newConcept,newAmount,bill)
+    hideNewMoveWrapper()
+    addNewMove(bill,newAmount,newConcept,id)
+  }
+  )
 }
 
 
@@ -414,6 +427,7 @@ function renderBill(bill){
 }
 
 function renderCurrentBillInfo(bill){
+  console.log("BIll is", bill)
   const currentBillInfo = document.getElementById('currentBillInfo')
   currentBillInfo.textContent = ""
   
@@ -489,6 +503,7 @@ function renderBillHeader(bill){
 }
 
 function renderSingleMoveDiv(move){
+  console.log("As", move)
   let concept = move['concept']
   let amount = move['amount']
 
@@ -501,14 +516,14 @@ function renderSingleMoveDiv(move){
 
 
 
-function addNewMove(bill,amount,paymentConcept,billId){
-  // console.log(bill)
+async function addNewMove(bill,amount,paymentConcept,billId){
+  console.log(bill, "SA", billId)
   let userId = auth.currentUser.uid;
   let billRef = doc(db,"bills",billId)
   let movesArray = bill['moves']
   // console.log("as",movesArray)
-  let newMove = createPaymentObj(userId,amount,paymentConcept)
-  movesArray.push(newMove)
+  let newMove = await createPaymentObj(userId,amount,paymentConcept)
+  movesArray.push(newMove)  
   // console.log(newMove)
     
   setDoc(billRef, { 'moves': movesArray }, { merge: true }).then((e)=>{
@@ -581,4 +596,16 @@ function displayNewMoveWrapper(b){
 function hideNewMoveWrapper(){
   const newMoveWrapper = document.querySelector('.new-move-wrapper')
   newMoveWrapper.classList.remove('show-new-move-wrapper')
+}
+
+
+function toggleBillMoveDescriptionDisplay(id){
+  const billDetailsDisplay = document.querySelector('.bill-details-display');
+  for (let i = 0; i < billDetailsDisplay.children.length; i++) {
+    if((billDetailsDisplay.children[i].id).substr(19)==id){
+      billDetailsDisplay.children[i].classList.remove("hidden-bill-move-description")
+    } else {
+      billDetailsDisplay.children[i].classList.add("hidden-bill-move-description")
+    }
+  }
 }

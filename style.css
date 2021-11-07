@@ -327,13 +327,19 @@ padding: 0 0.7rem;
   padding: 1rem;
   border-radius: 5px;
 }
+.add-new-move-btn:hover {
+  transform: scale(102%);
+  background-color: #c7c7d4;
+}
 .bill-wrapper {
   /* background-image: url('./img/bill-card.svg'); */
   /* background-repeat: no-repeat; */
   /* background-size:auto 100% ; */
   /* background-color: turquoise; */
 }
-
+.hidden-bill-move-description {
+  display:none
+}
 .bill-move-description-amount {
   /* background-color: rgb(27, 150, 103); */
   /* width: 100%; */
