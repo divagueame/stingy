@@ -28,10 +28,6 @@ const loggedOutWrapper = document.getElementById('loggedOutWrapper')
 const menuDots = document.querySelector('.menu-dots');
 const menuButtons = document.querySelector('.menu-buttons');
 
-// const userInfoDiv = document.getElementById('userInfoDiv')
-// const currentBillsDiv = document.getElementById('currentBillsDiv')
-
-
 registerForm.addEventListener('submit', function(e){
   e.preventDefault()
   let newUsername = document.getElementById('username').value
@@ -64,13 +60,9 @@ signInWithEmailAndPassword(auth, newUsername, newPassword)
   
 })
 
-
-
-
 window.addEventListener('DOMContentLoaded', (event) => {
   onAuthStateChanged(auth, (user) => {
-    //  User is logged in
-    if (user) {
+    if (user) { //  User is logged in
       const uid = user.uid;
       loggedOutWrapper.style.display = 'none'
       loggedInWrapper.style.display = 'flex'
@@ -85,39 +77,22 @@ window.addEventListener('DOMContentLoaded', (event) => {
         newBillWrapper.addEventListener('click', (e)=>{        
           addNewBill(userObj)
         })
+
       })
       
-      
-      // const menuDots = document.querySelector('.menu-dots');
-      // menuButtons.style.display = 'none'
-      // menuDots.style.display = 'flex'
       window.addEventListener('click', function(e){
         // console.log(menuDots)
         if (((e.target).parentElement==menuDots)||((e.target)==menuDots)){ // Open menu
-          // menuDots.style.display = 'none'
-          // menuButtons.style.display = 'flex'
           menuButtons.classList.add('menu-buttons-show')
         }
         else { //Close menu
-          // menuDots.style.display = 'flex'
-          // menuButtons.style.display = 'none '
           menuButtons.classList.remove('menu-buttons-show')
         }
       })
       
-
       let newbillbtn = document.createElement('button') 
       newbillbtn.innerHTML = 'Add new shared bill';
       newbillbtn.setAttribute('id', 'newbill-btn')
-      // loggedInWrapper.insertBefore(newbillbtn, loggedInWrapper.firstChild);
-      // loggedInWrapper.appendChild(newbillbtn)
-
-      // let currentsharedbillsbtn = document.createElement('button') 
-      // currentsharedbillsbtn.innerHTML = 'Show current shared bills';
-      // currentsharedbillsbtn.setAttribute('id', 'currentsharedbills-btn')
-      // currentsharedbillsbtn.addEventListener('click', function(){
-      //   getCurrentSharedBills(user)
-      // })
       
         
         logoutbtnWrapper.addEventListener('click', (e)=>{
@@ -140,8 +115,9 @@ window.addEventListener('DOMContentLoaded', (event) => {
               });
             })
     } else {   //User is logged out
-      loggedOutWrapper.style.display = 'flex'
-      loggedInWrapper.style.display = 'none'
+      loggedOutWrapper.style.display = 'flex';
+      loggedInWrapper.style.display = 'none';
+      clearBillWrappers()
     }
   })
 } )
@@ -216,13 +192,11 @@ function retrieveUserName(id){
 
 
 async function getCurrentSharedBills(userId){
-  const bills = [];  
-  const ids = [];
   const q = query(collection(db, "bills"), where("users", "array-contains", userId));
   onSnapshot(q, (querySnapshot) => {
     querySnapshot.docChanges().forEach((change,i)=>{
       if (change.type === "added") {
-        console.log("New bill: ", change.doc.data(), change.doc.id);
+        // console.log("New bill: ", change.doc.data(), change.doc.id);
           // bills.push(change.doc.data());
           // ids.push(change.doc.id)
       let theseMoves = change.doc.data()['moves'];
@@ -230,7 +204,8 @@ async function getCurrentSharedBills(userId){
       let thisBalance = calculate_balance(theseMoves,userId)
       renderBillTitle(theseUsers,thisBalance,change.doc.id);
       renderBillContent(change.doc.data(),change.doc.id)
-
+      
+        // bottomBalanceUpdate(undefined, 100)
     }
     if (change.type === "modified") {
         console.log("Modified bill: ", change.doc.data());
@@ -245,6 +220,8 @@ async function getCurrentSharedBills(userId){
     }
     if (change.type === "removed") {
         console.log("Removed bill: ", change.doc.data());
+        removeBillTitle(change.doc.id);
+        removeBillContent(change.doc.id)
     }
     
   }
@@ -262,6 +239,18 @@ function removeBillContent(id){
   let thisId = `billmovedescription${id}`
   let elem = document.getElementById(thisId)
   elem.parentElement.removeChild(elem)
+}
+
+function clearBillWrappers(){
+  const billwrappers = document.querySelectorAll(".bill-wrapper");
+  const billMoveDescriptions = document.querySelectorAll(".bill-move-description");
+  billwrappers.forEach(billwrapper=>{
+    billwrapper.parentElement.removeChild(billwrapper)
+  })
+
+  billMoveDescriptions.forEach(billMoveDrescription=>{
+    billMoveDrescription.parentElement.removeChild(billMoveDrescription)
+  })
 }
 
 function calculate_balance(movesArray,thisUserId){
@@ -367,39 +356,84 @@ function renderBillContent(bill,id){
     billMoveWrapper.appendChild(thisMoveDetailsDiv)
   })
 
+  let billNewmoveBtnWrapper = document.createElement('div');
+  billNewmoveBtnWrapper.classList.add('bill-newmovebtn-wrapper')
   let billNewmoveBtn = document.createElement('button');
+  let billNewMoveForm = getNewMoveForm(bill,id)
   billNewmoveBtn.classList.add("add-new-move-btn")
   billNewmoveBtn.classList.add("shadow")
   billNewmoveBtn.innerHTML = "+"
-  billMoveWrapper.appendChild(billNewmoveBtn)
+  
+  billNewmoveBtnWrapper.appendChild(billNewmoveBtn);
+  billNewmoveBtnWrapper.appendChild(billNewMoveForm);
+
+  billMoveWrapper.appendChild(billNewmoveBtnWrapper)
 billMoveDescription.appendChild(billMoveWrapper)
 let billDetailsDisplay = document.querySelector(".bill-details-display")
 billDetailsDisplay.appendChild(billMoveDescription)
 
 billNewmoveBtn.addEventListener('click', function(){
-  displayNewMoveWrapper(bill);
-  addNewMoveForm(bill,id)
-  
+  // displayNewMoveWrapper(bill);
+  // addNewMoveForm(bill,id)
+  toggleNewMoveWrapper(id)
 })
 }
 
-function addNewMoveForm(bill,id){
-  const newMoveForm = document.getElementById("new-move-form")
-  newMoveForm.addEventListener('submit', function(e){
-    e.preventDefault();
-    e.stopImmediatePropagation()
-    let newConcept = document.getElementById('new-move-concept').value
-    let newAmount = document.getElementById('new-move-amount').value
-    // console.log(newConcept,newAmount,bill)
-    hideNewMoveWrapper()
-    addNewMove(bill,newAmount,newConcept,id)
-  }
-  )
+
+function toggleNewMoveWrapper(id){
+  console.log(id)
+  let thisId = `addMoveForm${id}`
+  const newMoveRapper = document.getElementById(thisId);
+  newMoveRapper.classList.toggle("hidden-add-move-form")
+}
+
+function displayNewMoveWrapper(b){
+  const newMoveWrapper = document.querySelector('.new-move-form')
+  newMoveWrapper.classList.add('show-new-move-wrapper')
+}
+
+function hideNewMoveWrapper(){
+  const newMoveWrapper = document.querySelector('.new-move-form')
+  newMoveWrapper.classList.remove('show-new-move-wrapper')
 }
 
 
 
+function getNewMoveForm(bill,billId){
+  const form = document.createElement('form')
+  form.classList.add('new-move-form');
+  form.id = `addMoveForm${billId}`
+  const h2 = document.createElement('h2');
+  h2.innerText = "Add a new move"
+  const conceptInput = document.createElement('input');
+  conceptInput.setAttribute("type","text");
+  conceptInput.placeholder = 'Concept';
+  conceptInput.name = 'concept';
+  const amountInput = document.createElement('input');
+  amountInput.placeholder = 'Amount';
+  amountInput.name = 'amount';
+  amountInput.setAttribute("type","text")
+  const submitInput = document.createElement('input')
+  submitInput.setAttribute("type","submit");
+  submitInput.value = "add";
 
+  form.addEventListener('submit', (e)=>{
+    e.preventDefault();
+    
+    hideNewMoveWrapper();
+
+    let newAmount = amountInput.value;
+    let newConcept = conceptInput.value;
+    addNewMove(bill,newAmount,newConcept,billId)
+  })
+  form.appendChild(h2)
+  form.appendChild(conceptInput)
+  form.appendChild(amountInput)
+  form.appendChild(submitInput)
+  return form
+  }
+
+  
 function renderBill(bill){
   // currentBillsDiv.textContent = ""
   // console.log("THIS",bill.id)
@@ -587,17 +621,6 @@ async function userBillsData(user){
     return myBills
 }
 
-function displayNewMoveWrapper(b){
-  console.log(b)
-  const newMoveWrapper = document.querySelector('.new-move-wrapper')
-  newMoveWrapper.classList.add('show-new-move-wrapper')
-}
-
-function hideNewMoveWrapper(){
-  const newMoveWrapper = document.querySelector('.new-move-wrapper')
-  newMoveWrapper.classList.remove('show-new-move-wrapper')
-}
-
 
 function toggleBillMoveDescriptionDisplay(id){
   const billDetailsDisplay = document.querySelector('.bill-details-display');
@@ -608,4 +631,11 @@ function toggleBillMoveDescriptionDisplay(id){
       billDetailsDisplay.children[i].classList.add("hidden-bill-move-description")
     }
   }
+}
+
+function bottomBalanceUpdate(title='Balance',balance='0'){
+  balance += `€`
+  const bottomBalance = document.getElementById('bottom-balance');
+  bottomBalance.children[0].innerText=`${title}`
+  bottomBalance.children[1].innerText=`${balance}`
 }
