@@ -7,7 +7,7 @@ html, body {
   margin:0; /* remove default margin */
   padding:0; /* remove default padding */
   width:100%; /* take full browser width */
-  height:100%; /* take full browser height*/
+  height:100vh; /* take full browser height*/
   color: #25496C;
   /* font-family: 'IBM Plex Sans', sans-serif; */
   font-family: "Tw Cen MT";
@@ -204,9 +204,9 @@ h3 {
 } 
 
 .bills-list {
-padding: 0 0.7rem;
- display: flex; 
- flex-direction: column;
+  padding: 0 0.7rem;
+  display: flex; 
+  flex-direction: column;
 }
 
 
@@ -287,8 +287,20 @@ padding: 0 0.7rem;
 .new-bill-wrapper h2{
   margin-left: .2rem;
 }
-
-
+.add-user-btn {
+  width: 1rem;
+  height: 1rem;
+  background-color: #ffffff;
+  border: 2px solid black;
+}
+.add-user-btn:hover {
+  cursor: pointer;
+  transform: rotate(360deg);
+  transition: all 300ms ease-out;
+}
+.add-user-form {
+  background-color: #EA92B7;
+}
 .add-new-bill-btn{
   background-image: url('./img/add-icon.svg');
   background-repeat: no-repeat;
@@ -305,94 +317,120 @@ padding: 0 0.7rem;
   background-color:white;
   display: flex;
   justify-content: space-between;
-  padding: .41rem;
+  align-items: flex-end;
+  /* padding: .41rem 0; */
   border-bottom: 1px solid rgb(170, 170, 170);
+  /* background-color: turquoise; */
+  padding-bottom: 0;
+  margin-bottom: .5rem;
 }
 .bill-move-details > div {
   flex-basis: 25%;
+  
 }
+
 .bill-move-details >.bill-move-description-delete-btn {
-  flex-basis: 0;
+  
+  flex-grow: 0;
+  background-color: rgb(196, 133, 170);
+  color: white;
+  /* border: 2px solid blue; */
+  padding: 1rem 1rem;
+  font-weight: 800;
+  text-align: center;
+  
+  margin-left: auto; 
+  font-size: 2rem;
+  border-radius: .4rem;
+  flex-basis: 5rem;
 }
 .bill-move-description {
   margin-bottom: 4rem;
 }
-.add-new-move-btn {
-  background-color: #b9bbff;
-  padding: 1rem;
-  border-radius: 5px;
-  z-index: 2;
-}
-.add-new-move-btn:focus,
-.add-new-move-btn:hover {
-  transform: scale(102%);
-  background-color: #ffffff;
-}
 
-.bill-newmovebtn-wrapper {
-  display: flex;
-  flex-direction: row;
-  overflow: hidden;
-  position: relative
-};
-
-.new-move-form {
-  background-color: #094067;
-  outline: #b9bbff 3px;
-}
-.bill-wrapper {
-  /* background-image: url('./img/bill-card.svg'); */
-  /* background-repeat: no-repeat; */
-  /* background-size:auto 100% ; */
-  /* background-color: turquoise; */
-}
 .hidden-bill-move-description {
   display:none
 }
 .bill-move-description-amount {
-  /* background-color: rgb(27, 150, 103); */
-  /* width: 100%; */
   display: flex;
   justify-content: flex-end;
 }
-.new-move-wrapper {
-  background-color: #EA92B7;
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  /* margin: 1rem; */
-  right: -100%;
-  /* display: none; */
-  /* right: 0%; */
-  transition: all .4s ease-in-out;
+.bill-move-description-author {
+  /* background-color: violet; */
+  margin-left: auto;
 }
-.show-new-move-wrapper {
-  /* display: block; */
-  /* right: 0; */
+.bill-move-description-delete-btn:hover {
+  cursor: pointer;
+  transform: scale(1.05);
+  background-color: #ff5656;
+} 
+.bill-newmovebtn-wrapper {
+  margin-top: 1.5rem;
 }
-.new-move-form {
-  position: relative;
-  z-index: 1;
-  left: -100%;
-  transition: 1s left ease;
+.new-move-form { 
+  display: flex; 
+} 
+.bill-newmovebtn-wrapper >.new-move-form > .amount-input {
+  /* background-color: rgb(255, 196, 196); */
+  /* display: flex; */
+  /* justify-content: flex-end; */
+  
+  
+} 
+[placeholder]:focus::-webkit-input-placeholder {
+  transition: text-indent 0.5s 0.4s ease; 
+  text-indent: -200%;
+  opacity: 1;
 }
-.hidden-add-move-form{
-  background-color: #FFC7C7;
-  left: 0%
-}
-#new-move-form {
-  background-color: white;
-  margin: 1rem;
-  border-radius: 5px;
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-#new-move-form > * {
-  margin-bottom: 1rem;
-}
+
+.bill-newmovebtn-wrapper >.new-move-form > input[type="text"] {  
+   border: 0;
+   border-bottom: 2px rgba(255, 115, 225, 0.514) solid;
+   outline: 0;
+   background-color: none;
+   width: 25%;
+   /* flex-basis: 25%; */
+   flex-grow: 0;
+   flex-shrink: 1;
+   line-height: 0;
+   height: 100%; 
+   border:none;
+   border-bottom: 2px solid rgba(128, 47, 128, 0.425);
+   outline: none;
+   font-size: 2rem;
+   height: 100%;
+   margin: auto 0;
+ } 
+ 
+ .bill-newmovebtn-wrapper >.new-move-form > input[type="text"]:nth-child(2) {
+  text-align: right; 
+  margin-left: 1rem;
+  margin-right: auto;
+  max-width: fit-content;
+  /* flex-basis: 10%; */
+ } 
+
+ .bill-newmovebtn-wrapper > .new-move-form > input[type="submit"] {
+   background-color: white;
+   /* margin-left: auto; */
+   /* padding: 1rem 1rem; */
+   
+   outline: none;
+   border-width: 0;
+   background-color: thistle;
+   color: purple;
+   font-weight: 800;
+   font-size: 2rem;
+   border-radius: .4rem;
+   flex-basis: 5rem;
+   flex-shrink: 0;
+   height: 5rem;
+ }
+ .bill-newmovebtn-wrapper > .new-move-form > input[type="submit"]:hover {
+   background-color: #d42e2e;
+   cursor: pointer;
+ }
+ 
 #bottom-balance {display: none;}
 .balance {
   
@@ -424,6 +462,14 @@ padding: 0 0.7rem;
   padding-top: .55rem;
 }
 
+.leave-bill-btn {
+  /* background-color: #bbbfc4; */
+}
+.leave-bill-btn:hover {
+  background-color: #4B739A;
+  cursor: pointer;
+}
+
 /* Bigger screen adjustments */
 @media only screen and (min-width: 600px) {
   html, body {
@@ -439,8 +485,14 @@ padding: 0 0.7rem;
   } 
 
   #loggedOutWrapper > header{
-    margin-top: 5%;
+    /* margin-top: 5%; */
+    padding-top: 5%;
   }
+  #registerForm > input[type='submit']:hover {
+    transform: scale(1.01);
+    background-color: rgb(255, 198, 198);
+  }
+
   #loggedOutWrapper > .formDiv {
     margin-bottom: 15%;
     margin-left: 25%;
@@ -449,6 +501,7 @@ padding: 0 0.7rem;
 
   #loggedInWrapper {
     background-image: url('./img/desktop-bg2.svg');
+    display: block;
     /* justify-content: flex-start; */
     /* background-position: top; */
   }
@@ -486,10 +539,6 @@ padding: 0 0.7rem;
     border-radius: 5px;
   }
 
-  section {
-    background-color: white;
-  }
-  
   .logout-btn-wrapper {
     margin-left: 3rem;
   }
@@ -515,15 +564,18 @@ padding: 0 0.7rem;
     margin: 3% 10% 110% 10%;
     margin-bottom: 10px;
     display: flex;
-    /* justify-content: ; */
+    gap: 3%;
+    justify-content: space-between;
+    /* min-height: 60%; */
+    /* height: auto; */
     /* min-height: 70%; */
     /* height: 70%; */
     border-radius: 5px;
     align-items: stretch;
   }
 section > .bills-list {
-  flex-basis: 1;
-  flex-grow: 1;
+  flex-basis: 20%;
+  flex-grow: 0;
   /* background-color: rgb(184, 42, 42); */
 }
   section > .bill-details-display {
@@ -538,16 +590,58 @@ section > .bills-list {
 
   .bill-move-header {
     background-color:white;
-    padding: 0.5rem;
+    padding: 1rem;
+    font-size: 3rem;
     margin-bottom: 1rem;
-    padding-left: 3rem;
+    /* padding-left: 3rem; */
     border-radius: 5px;
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
   }
-
+  .bill-move-header > h2 {
+    flex-basis: calc(100% - 32px);
+    background-color: white;
+    padding-left: 2rem;
+    z-index: 2;
+  }
+ 
+  .headerOptionsBtn{
+    /* 'grid-dots.svg' */
+    width: 32px;
+    height: 32px;
+    /* background-color: #25496C; */
+    background-image: url('./img/threedots.svg');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-color: white;
+    z-index: 2;
+    flex-shrink: 0;
+    flex-grow: 0;
+    flex-basis: 32px
+  };
   .web-shadow {
     -webkit-filter: drop-shadow( 0px 4px 4px rgba(0, 0, 0, .25));
     filter: drop-shadow( 0px 4px 4px rgba(0, 0, 0, .25));
   }
+
+  .headerOptionsBtn:hover {
+    cursor: pointer;
+    /* background-color: #cc00ff57; */
+    transform: rotate(90deg);
+    transition: 300ms ease transform;
+  }
+  .leave-bill-btn, .add-user-form {
+    /* background-color: #d42e2e; */
+    /* position: absolute; */
+    width: calc(100% - 0rem); 
+    height: calc(100% - 0rem);
+    overflow: hidden; 
+    transition: 400ms all ease;
+  }
+  .leave-bill-btn-hidden, .add-user-form-hidden { 
+    display: none; 
+  } 
 
   .bills-list{
     margin: 2rem;
@@ -595,7 +689,7 @@ section > .bills-list {
 
   footer {
     /* background-color: wheat; */
-    /* position: absolute; */
-    /* bottom: 0; */
+    margin-top: auto;
   }
 }
+
