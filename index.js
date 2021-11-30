@@ -386,6 +386,8 @@ function renderBillTitle(usersObjs, balance, billId) {
     e.stopPropagation();
     e.stopImmediatePropagation();
     toggleBillMoveDescriptionDisplay(billId);
+    toggleActiveState(billWrapper)
+    
   });
 }
 
@@ -410,10 +412,10 @@ function renderBillContent(bill, id, userObj, visible = false) {
 
     emailInput.setAttribute("type", "text");
     emailInput.placeholder = "New user e-mail";
-    emailInput.email = "email";
+    emailInput.email = "E-MAIL";
     const submitInput = document.createElement("input");
     submitInput.setAttribute("type", "submit");
-    // submitInput.value = "add";
+    submitInput.value = "ADD FRIEND";
     submitInput.classList.add("add-new-user-btn-submit");
     addUserForm.appendChild(emailInput);
     addUserForm.appendChild(submitInput);
@@ -441,7 +443,7 @@ function renderBillContent(bill, id, userObj, visible = false) {
 
   let leaveBillBtn = document.createElement('div')
   leaveBillBtn.classList.add('leave-bill-btn');
-  leaveBillBtn.innerHTML = 'Leave this bill'
+  leaveBillBtn.innerHTML = 'QUIT BILL'
   leaveBillBtn.addEventListener('click',()=>{
     let currentUsers = bill.users;
     removeUser(currentUsers,userObj,id)
@@ -449,7 +451,7 @@ function renderBillContent(bill, id, userObj, visible = false) {
 
   billMoveDescription.classList.add("bill-move-description");
   billMoveWrapper.classList.add("bill-move-wrapper");
-  billMoveHeader.classList.add("shadow");
+  // billMoveHeader.classList.add("shadow");
   billMoveHeader.classList.add("bill-move-header");
   let headerTitle = document.createElement('h2');
   headerTitle.innerHTML = 'Balance'
@@ -540,6 +542,7 @@ function toggleNewMoveWrapper(id) {
   let thisId = `addMoveForm${id}`;
   const newMoveRapper = document.getElementById(thisId);
   newMoveRapper.classList.toggle("hidden-add-move-form");
+
 }
 
 function getNewMoveForm(bill, billId) {
@@ -789,4 +792,14 @@ async function  removeUser(currentUsers,userObj,docId){
         });
   }
   
+}
+
+
+function toggleActiveState(newActiveWrapper){
+
+  const newMoveRappers = document.querySelectorAll('.bill-wrapper');
+    newMoveRappers.forEach(wrapper=>{
+      wrapper.classList.remove("bill-wrapper-active");
+    })
+    newActiveWrapper.classList.add("bill-wrapper-active"); 
 }
